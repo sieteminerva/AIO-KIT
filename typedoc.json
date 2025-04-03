@@ -1,0 +1,54 @@
+{
+  "name": "AIO-KIT",
+  "readme": "readme.md",
+  // "customFooterHtml": "Copyright <strong>ymgh</strong> 2025",
+  "packageOptions": {},
+  "entryPoints": [
+    "src/modules/DataGenerator.ts",
+    "src/modules/FileConverter.ts",
+    "src/modules/TextProcessor.ts",
+    "src/modules/ImageProcessor.ts",
+    "src/modules/ProjectScaffolder.ts",
+    "src/modules/Utility.ts",
+    "src/modules/Main.ts",
+  ],
+  "exclude": [
+    "src/lib/scripts/InteractiveList.ts",
+    "src/lib/scripts/CustomPrompt.ts",
+  ],
+  "out": "typedoc",
+  "plugin": [
+    "typedoc-github-theme"
+  ],
+  "alwaysCreateEntryPointModule": false,
+  "cleanOutputDir": true,
+  "navigation": {
+    "includeFolders": false,
+    "compactFolders": false,
+    "includeGroups": true,
+    "includeCategories": true,
+    "excludeReferences": false
+  },
+  "categorizeByGroup": true,
+  "sidebarLinks": {},
+  "favicon": "src/lib/templates/assets/aio_watermark.png",
+  "tsconfig": "./tsconfig.json",
+  "excludePrivate": false, // keep private items to be documented.
+  "excludeProtected": false, // keep protected items to be documented.
+  "excludeExternals": true,
+  "disableSources": true,
+  "commentStyle": "all",
+  "jsDocCompatibility": {
+    "exampleTag": true,
+    "defaultTag": true,
+    "inheritDocTag": true,
+    "ignoreUnescapedBraces": true
+  },
+  "externalSymbolLinkMappings": {
+    "global": {
+      "ymgh": "https://github.com/sieteminerva"
+    }
+  },
+  "suppressCommentWarningsInDeclarationFiles": true,
+  "intentionallyNotExported": [] // add this to prevent error :  Cannot find any symbols with the specified entry points
+}

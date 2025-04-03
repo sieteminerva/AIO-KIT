@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "strict": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "rootDir": "./src",
+    "outDir": "./dest",
+    "declaration": true,
+    "declarationDir": "./dest/types",
+    "resolveJsonModule": true
+  },
+  "include": [
+    "src/**/*.ts",
+    "archieves/Auth.class.keyfile.ts",
+  ],
+  "exclude": [
+    "node_modules",
+    "archieves",
+    "docs",
+    "compileAssets.ts",
+    // "src/modules/*.ts"
+  ]
+}

@@ -1,0 +1,10 @@
+.env
+.vscode/**
+node_modules
+test/**
+archieves/**
+docs/**
+server/**
+typedoc/**
+TODO
+docs.json

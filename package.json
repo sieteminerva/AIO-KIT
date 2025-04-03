@@ -1,0 +1,58 @@
+{
+  "name": "aio-kit",
+  "version": "1.0.0",
+  "description": "an aio development kit",
+  "main": "dest/index.js",
+  "type": "module",
+  "preferGlobal": true,
+  "bin": {
+    "aio": "dest/index.js"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "types": "dest/types/index.d.ts",
+  "test": "dest/test/**/*.js",
+  "scripts": {
+    "dev": "npx tsx src/index.ts",
+    "build": "tsc && npx tsx ./compileAssets.ts && npm link",
+    "start": "node dest/index.js",
+    "docs": "npx typedoc"
+  },
+  "keywords": [
+    "kit"
+  ],
+  "author": "galih.hayuningtyas@outlook.com",
+  "license": "ISC",
+  "dependencies": {
+    "@faker-js/faker": "^9.6.0",
+    "@google-cloud/translate": "^9.0.1",
+    "@google-cloud/vertexai": "^1.9.3",
+    "@google/generative-ai": "^0.24.0",
+    "@inquirer/prompts": "^7.4.0",
+    "commander": "^13.1.0",
+    "dotenv": "^16.4.7",
+    "google-auth-library": "^9.15.1",
+    "googleapis": "^148.0.0",
+    "json-2-csv": "^5.5.9",
+    "lodash-es": "^4.17.21",
+    "mammoth": "^1.9.0",
+    "node-fetch": "^3.3.2",
+    "pdf-parse": "^1.1.1",
+    "sharp": "^0.33.5",
+    "svgson": "^4.1.0",
+    "yamljs": "^0.3.0",
+    "yoctocolors": "^2.1.1"
+  },
+  "devDependencies": {
+    "@types/commander": "^2.12.2",
+    "@types/json2csv": "^4.2.0",
+    "@types/lodash-es": "^4.17.12",
+    "@types/node": "^22.13.10",
+    "@types/yamljs": "^0.2.30",
+    "tsx": "^4.19.3",
+    "typedoc": "^0.27.6",
+    "typedoc-github-theme": "^0.2.1",
+    "typescript": "^5.7.2"
+  }
+}
