@@ -3,7 +3,7 @@
 node_modules
 test/**
 archieves/**
-docs/**
+docs-etc/**
 server/**
 TODO
 docs.json
