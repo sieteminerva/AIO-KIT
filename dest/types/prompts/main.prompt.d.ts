@@ -14,4 +14,4 @@
  * MainDialogPrompt('/path/to/my/directory', 'myFile.txt');
  * ```
  */
-export declare function MainDialogPrompt(DIR: string, filename?: string): Promise<void>;
+export declare function MainDialogPrompt(DIR: string, filename?: string, options?: any): Promise<void>;

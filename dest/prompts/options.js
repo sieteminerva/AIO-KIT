@@ -52,6 +52,7 @@ export const IMAGE_TASKS = [
     { value: 'quit', name: `${yellowBright('[Quit]')}` }
 ];
 export const UTIL_TYPES = [
+    { name: 'html to json', value: 'html to json' },
     { name: 'json to csv', value: 'json to csv' },
     { name: 'csv to json', value: 'csv to json' },
     { name: 'json to yaml', value: 'json to yaml' },

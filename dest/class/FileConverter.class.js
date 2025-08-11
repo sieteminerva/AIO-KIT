@@ -1,9 +1,32 @@
 import { json2csv, csv2json } from "json-2-csv";
 import YAML from 'yamljs';
 import { AioFileOperation } from "./FileOperation.class.js";
+import { html2json, html2jsonWithPlaceholder } from "../lib/scripts/html-converter.js";
 /**
- * // TODO
+ * # AioFileConverter
+ *
+ * The `AioFileConverter` class is a versatile utility for handling file conversions between various formats, including JSON, CSV, and YAML. It extends the `AioFileOperation` class, inheriting its file handling capabilities.
+ *
+ * ### Installation
+ *
+ * ```bash
+ *
+ *    npm install json-2-csv yamljs
+ *
+ * ```
+ * ## Features
+ *
+ * -   **JSON Handling**: Read and parse JSON files into JavaScript objects.
+ * -   **CSV Handling**: Read and parse CSV files into arrays of JavaScript objects.
+ * -   **YAML Handling**: Read and parse YAML files into JavaScript objects.
+ * -   **Format Conversion**: Convert between JSON, CSV, and YAML formats.
+ * -   **Method Chaining**: Supports method chaining for fluent API usage.
+ *
+ * ## TODO
  * - markdown to html vise versa
+ *
+ * @see {@link https://www.npmjs.com/package/json-2-csv|json-2-csv}
+ * @see {@link https://www.npmjs.com/package/yamljs|yamljs}
  */
 export class AioFileConverter extends AioFileOperation {
     /**
@@ -16,6 +39,15 @@ export class AioFileConverter extends AioFileOperation {
      */
     constructor(filepath) {
         super(filepath);
+        /**
+        * Converter Options `AioFileConverter` class.
+        *
+        * The options, which specifies option in to the file to be converted.
+        * If `options` is not specified, the converter will run the default way.
+        *
+        * @param {string} [_options] The converted options.
+        */
+        this._options = false;
     }
     /**
      * Reads and parses a JSON file into a JavaScript object.
@@ -101,6 +133,18 @@ export class AioFileConverter extends AioFileOperation {
         const fileContent = await this.read(filepath);
         const yaml = YAML.parse(fileContent);
         this.content = yaml;
+        return this;
+    }
+    /**
+     *
+     *
+     * @param {string} filepath
+     * @memberof AioFileConverter
+     */
+    async html(filepath, usePlaceholder = false) {
+        this._options = usePlaceholder;
+        this.ext = this._getExtension(filepath);
+        this.content = await this.read(filepath);
         return this;
     }
     /**
@@ -222,10 +266,18 @@ export class AioFileConverter extends AioFileOperation {
             const json = JSON.stringify(this.content);
             this.content = json;
         }
+        // Convert HTML to JSON string
+        if (this.ext === '.html') {
+            let html = '';
+            if (!this._options) {
+                html = html2json(this.content);
+            }
+            else {
+                html = html2jsonWithPlaceholder(this.content);
+            }
+            this.content = html;
+        }
         return this;
-    }
-    html(filepath) {
-        console.warn('Not Implemented yet!');
     }
     md() {
         console.warn('Not Implemented yet!');

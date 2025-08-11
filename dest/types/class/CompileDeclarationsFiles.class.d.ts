@@ -25,6 +25,7 @@ export declare class CompileDeclarationsFiles {
     private _targetDirectory;
     private _dtsExt;
     private _jsExt;
+    private _tsExt;
     private _outputName;
     private _root;
     /**

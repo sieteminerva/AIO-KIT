@@ -2,7 +2,6 @@ import { select } from "@inquirer/prompts";
 import { FileConverterPrompt } from "./FileConverter.prompt.js";
 import { UTIL_TYPES } from "../options.js";
 import { handlePromptError } from "../ErrorHandler.prompt.js";
-import { MainDialogPrompt } from "../main.prompt.js";
 /**
  * Presents a selection prompt to the user for choosing a file conversion task.
  *
@@ -12,19 +11,27 @@ import { MainDialogPrompt } from "../main.prompt.js";
  *
  * @param DIR - The current directory path.
  * @param filename - The current filename (not directly used in this function, but passed for consistency).
+ * @param options - The converter options.
  *
  * @example
  * ```typescript
  * await SelectFileConverterPrompt('/path/to/directory', 'example.txt');
+ * await SelectFileConverterPrompt('/path/to/directory', 'example.txt', true);
  * ```
  */
-export async function SelectFileConverterPrompt(DIR, filename) {
+export async function SelectFileConverterPrompt(DIR, filename, options) {
     try {
         const task = await select({
-            message: 'Choose File to Convert',
+            message: 'Choose Converter Task',
             choices: UTIL_TYPES.map((menu) => ({ name: menu.name, value: menu.value })),
         });
         switch (task) {
+            case 'html to json':
+                FileConverterPrompt('.html', '.json');
+                break;
+            case 'yaml to csv':
+                FileConverterPrompt('.yaml', '.csv');
+                break;
             case 'json to csv':
                 FileConverterPrompt('.json', '.csv');
                 break;
@@ -43,17 +50,16 @@ export async function SelectFileConverterPrompt(DIR, filename) {
             case 'yaml to csv':
                 FileConverterPrompt('.yaml', '.csv');
                 break;
-            case 'back':
-                await MainDialogPrompt(DIR);
-                break;
             case 'quit':
                 process.exit(0);
         }
+        console.clear();
+        return task;
     }
     catch (error) {
         handlePromptError(error);
     }
     finally {
-        await SelectFileConverterPrompt(DIR, filename);
+        await SelectFileConverterPrompt(DIR, filename, options = false);
     }
 }

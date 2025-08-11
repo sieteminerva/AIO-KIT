@@ -12,4 +12,4 @@
  *
  * @example FileConverterPrompt('.yaml', '.csv') // Convert all selected .yaml files to .csv
  */
-export declare function FileConverterPrompt(fromExt: string, toExt: string): Promise<void>;
+export declare function FileConverterPrompt(fromExt: string, toExt: string, options?: any): Promise<string[] | undefined>;

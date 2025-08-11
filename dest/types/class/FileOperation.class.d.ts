@@ -94,7 +94,7 @@ export declare class AioFileOperation {
      *
      * ```
      */
-    search(directory: string, ext: string | string[] | undefined, showDir?: boolean): Promise<Dirent[] | undefined>;
+    search(directory: string, ext?: string | string[] | undefined, showDir?: boolean): Promise<Dirent[] | undefined>;
     /**
      * Reads a file line by line and returns an array of strings, where each string is a line from the file.
      *

@@ -7,10 +7,12 @@
  *
  * @param DIR - The current directory path.
  * @param filename - The current filename (not directly used in this function, but passed for consistency).
+ * @param options - The converter options.
  *
  * @example
  * ```typescript
  * await SelectFileConverterPrompt('/path/to/directory', 'example.txt');
+ * await SelectFileConverterPrompt('/path/to/directory', 'example.txt', true);
  * ```
  */
-export declare function SelectFileConverterPrompt(DIR: string, filename: string): Promise<void>;
+export declare function SelectFileConverterPrompt(DIR: string, filename?: string, options?: any): Promise<string | undefined>;

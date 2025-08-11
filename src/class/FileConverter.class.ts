@@ -3,6 +3,8 @@
 import { json2csv, csv2json } from "json-2-csv";
 import YAML from 'yamljs';
 import { AioFileOperation } from "./FileOperation.class.js";
+import { read, readFileSync } from "node:fs";
+import { html2json, html2jsonWithPlaceholder } from "../lib/scripts/html-converter.js";
 
 /**
  * # AioFileConverter
@@ -31,6 +33,16 @@ import { AioFileOperation } from "./FileOperation.class.js";
  * @see {@link https://www.npmjs.com/package/yamljs|yamljs}
  */
 export class AioFileConverter extends AioFileOperation {
+
+  /**
+  * Converter Options `AioFileConverter` class.
+  *
+  * The options, which specifies option in to the file to be converted.
+  * If `options` is not specified, the converter will run the default way.
+  *
+  * @param {string} [_options] The converted options.
+  */
+  private _options: string | boolean | any = false;
 
 
   /**
@@ -132,6 +144,18 @@ export class AioFileConverter extends AioFileOperation {
     const fileContent = await this.read(filepath);
     const yaml = YAML.parse(fileContent);
     this.content = yaml;
+    return this;
+  }
+  /**
+   *
+   *
+   * @param {string} filepath
+   * @memberof AioFileConverter
+   */
+  async html(filepath: string, usePlaceholder: boolean = false) {
+    this._options = usePlaceholder;
+    this.ext = this._getExtension(filepath);
+    this.content = await this.read(filepath);
     return this;
   }
 
@@ -256,12 +280,17 @@ export class AioFileConverter extends AioFileOperation {
       const json: any = JSON.stringify(this.content as any);
       this.content = json;
     }
+    // Convert HTML to JSON string
+    if (this.ext === '.html') {
+      let html = '';
+      if (!this._options) {
+        html = html2json(this.content as any);
+      } else {
+        html = html2jsonWithPlaceholder(this.content as any);
+      }
+      this.content = html;
+    }
     return this;
-  }
-
-
-  html(filepath: string) {
-    console.warn('Not Implemented yet!')
   }
 
   md() {

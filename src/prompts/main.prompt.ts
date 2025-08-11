@@ -26,7 +26,7 @@ const DEST_DIR = process.cwd();
  * MainDialogPrompt('/path/to/my/directory', 'myFile.txt');
  * ```
  */
-export async function MainDialogPrompt(DIR: string, filename?: string) {
+export async function MainDialogPrompt(DIR: string, filename?: string, options?: any) {
 
   DIR ? DIR : DEST_DIR
   try {
@@ -45,7 +45,7 @@ export async function MainDialogPrompt(DIR: string, filename?: string) {
         await DataGeneratorPrompt(DIR, null);
         break;
       case 'utility':
-        await SelectUtilityPrompt(DIR, filename);
+        await SelectUtilityPrompt(DIR, filename, options);
         break;
       case 'textminator':
         await TextProcessorPrompt();

@@ -19,6 +19,100 @@ export type AioTextProcessorMethods = 'summarized' | 'translate' | 'split' | 'fi
  * just pass the authenticated object TranslateClient() and GenerativeModel
  * as parameter. Move VertexAI
  */
+/**
+ * @class AioTextProcessor
+ * The `AioTextProcessor` class provides a suite of methods for processing text files, including reading, summarizing, translating, splitting, merging, comparing, purifying, analyzing, finding matches, and replacing text.
+ * It leverages Google Cloud's Vertex AI and Translate APIs for advanced text processing capabilities.
+ *
+ * @example
+ * ```typescript
+ * import { AioTextProcessor } from './TextProcessor.class';
+ *
+ * async function main() {
+ *   const processor = new AioTextProcessor();
+ *
+ *   // Summarize a file
+ *   await processor.summarized('path/to/your/file.txt', { maxLength: 100, showStatistic: true });
+ *   console.log('Summarized:', processor.content);
+ *
+ *   // Translate a file
+ *   await processor.translate('path/to/your/file.txt', 'en-US');
+ *   console.log('Translated:', processor.content);
+ *
+ *   // Split a file into chunks
+ *   await processor.split('path/to/your/file.txt', 1000);
+ *   console.log('Split:', processor.content);
+ *
+ *   // Merge multiple files
+ *   await processor.merge('path/to/file1.txt', 'path/to/file2.txt');
+ *   console.log('Merged:', processor.content);
+ *
+ *   // Compare two files
+ *   await processor.compare('path/to/file1.txt', 'path/to/file2.txt');
+ *   console.log('Compared:', processor.content);
+ *
+ *   // Purify a file (remove extra whitespace)
+ *   await processor.purify('path/to/your/file.txt');
+ *   console.log('Purified:', processor.content);
+ *
+ *   // Analyze a file
+ *   await processor.analyze('path/to/your/file.txt');
+ *   console.log('Analyzed:', processor.content);
+ *
+ *   // Find matches in a file
+ *   await processor.findMatch('path/to/your/file.txt', { keyword: 'example', matchCase: false });
+ *   console.log('Matches:', processor.content);
+ *
+ *   // Replace text in a file
+ *   const replaceOptions = [
+ *     { "{name}": "John Doe" },
+ *     { "{date}": "2024-01-01" },
+ *   ];
+ *   await processor.replace('path/to/your/file.txt', replaceOptions);
+ *   console.log('Replaced:', processor.content);
+ * }
+ *
+ * main().catch(console.error);
+ * ```
+ *
+ * @class AioTextProcessor
+ * @extends AioFileOperation
+ *
+ * @property {string} content - The processed text content.
+ * @property {any} options - Additional options for text processing.
+ *
+ * @see {@link AioTextProcessor.constructor }  - Initializes the `AioTextProcessor` and sets up Google Cloud clients.
+ * @see {@link AioTextProcessor.initAuth }  - Initializes the authentication for Google Cloud services.
+ * @see {@link AioTextProcessor.initGoogleClients }  - Initializes the Vertex AI and Translate clients.
+ * @see {@link AioTextProcessor.summarized }  - Summarizes the content of a text file using the Gemini AI model.
+ * @see {@link AioTextProcessor.translate }  - Translates the content of a text file to a specified target language.
+ * @see {@link AioTextProcessor.read }  - Reads the content of a file, handling different file types (.docx, .pdf, .txt).
+ * @see {@link AioTextProcessor.merge }  - Merges the content of multiple files into a single string.
+ * @see {@link AioTextProcessor.split }  - Splits the content of a text file into chunks of a specified size.
+ * @see {@link AioTextProcessor.compare }  - Compares the content of two files and identifies the differences.
+ * @see {@link AioTextProcessor.purify }  - Removes extra whitespace from the content of a text file.
+ * @see {@link AioTextProcessor.analyze }  - Analyzes the content of a text file to provide statistics.
+ * @see {@link AioTextProcessor.findMatch }  - Finds matches of a keyword or pattern within the text.
+ * @see {@link AioTextProcessor.replace }  - Replaces specified tags in a file with corresponding values.
+ * @see {@link AioTextProcessor.format }  - Formats the content of a file (currently not implemented).
+ *
+ * @interface InsertOptions - Defines the structure for insert options.
+ * @interface MatchOptions - Defines the structure for match options.
+ * @interface AnalyzeResult - Defines the structure for analysis results.
+ *
+ * @type {AioTextProcessorMethods} - Defines the available methods in `AioTextProcessor`.
+ *
+ * @private
+ * @readonly
+ * @property {string} DEFAULT_TEXT_MODEL - The default text model used for generative AI tasks.
+ *
+ * @throws {Error} Throws an error if there is an issue with file reading, API requests, or invalid input.
+ *
+ * @see {@link https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini|Gemini AI Model}
+ * @see {@link https://cloud.google.com/translate/docs/reference/rest/v3/projects.locations.translateText|Google Translate API}
+ * @see {@link https://www.npmjs.com/package/mammoth|Mammoth}
+ * @see {@link https://www.npmjs.com/package/pdf-parse|Pdf-parse}
+ */
 export declare class AioTextProcessor extends AioFileOperation {
     private _output;
     private _options;

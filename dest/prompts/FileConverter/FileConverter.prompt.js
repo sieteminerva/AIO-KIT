@@ -1,6 +1,6 @@
 import { checkbox } from "@inquirer/prompts";
-import { greenBright } from "yoctocolors";
-import { join } from "path";
+import { greenBright, yellowBright } from "yoctocolors";
+import { extname, join } from "path";
 import { AioFileConverter } from "../../class/FileConverter.class.js";
 import { handlePromptError } from "../ErrorHandler.prompt.js";
 /**
@@ -17,15 +17,18 @@ import { handlePromptError } from "../ErrorHandler.prompt.js";
  *
  * @example FileConverterPrompt('.yaml', '.csv') // Convert all selected .yaml files to .csv
  */
-export async function FileConverterPrompt(fromExt, toExt) {
+export async function FileConverterPrompt(fromExt, toExt, options) {
     try {
         const DIR = process.cwd();
         const converter = new AioFileConverter();
-        const folder = await converter.search(DIR, toExt, false);
+        const folder = await converter.search(DIR);
         // console.log(`Found files:`, folder); // Debugging
         const fileSelected = await checkbox({
             message: 'Select files to convert\n',
-            choices: folder.map(file => ({ name: file.name, value: join(file.parentPath, file.name) }))
+            choices: folder.map(file => ({ name: file.name, value: join(file.parentPath, file.name) })),
+            validate(choices) {
+                return converterFilesValidation(choices, fromExt);
+            },
         });
         if (Array.isArray(fileSelected) && fileSelected.length > 0) {
             // console.log('File Selected : ', fileSelected);
@@ -39,6 +42,9 @@ export async function FileConverterPrompt(fromExt, toExt) {
                     case '.csv':
                         file = await converter.csv(filepath);
                         break;
+                    case '.html':
+                        file = await converter.html(filepath, options);
+                        break;
                     default:
                         file = await converter.json(filepath);
                         break;
@@ -51,19 +57,42 @@ export async function FileConverterPrompt(fromExt, toExt) {
                     case '.yaml':
                         file.toYaml();
                         break;
-                    default:
+                    case '.json':
                         file.toJson();
                         break;
+                    case 'quit':
+                        process.exit(0);
                 }
                 // console.log(`=== csv:`, file.content); //Debugging
                 await converter.write(filepath.replace(fromExt, toExt), file.content);
             }
             ;
         }
-        const msg = greenBright(`${fileSelected.length} files successfully converted to '${toExt}'`);
-        console.log(msg);
+        console.clear();
+        const msg = greenBright(`\n\n${fileSelected.length} files successfully converted to '${toExt}'`);
+        const msg2 = yellowBright(`\nSelect Another One or 'Ctrl + C' to Quit to End the Process!`);
+        console.log(msg, msg2);
+        return fileSelected;
     }
     catch (error) {
         handlePromptError(error);
     }
+    finally {
+        console.clear();
+        // await FileConverterPrompt(fromExt, toExt);
+    }
+}
+function converterFilesValidation(files, fromExt) {
+    // must select a file
+    if (files.length === 0) {
+        return 'You must select at least a file';
+    }
+    // only with `fromExt` files are allowed to select
+    for (const file of files) {
+        const file_ext = extname(file.name).toLowerCase();
+        if (file_ext !== fromExt) {
+            return file.name + ` is not a ${fromExt} file. Only ${fromExt} files are allowed!`;
+        }
+    }
+    return true;
 }

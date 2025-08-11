@@ -12,4 +12,4 @@
  * @example
  * // Example usage: SelectUtilityPrompt('/path/to/directory', 'example.txt');
  */
-export declare function SelectUtilityPrompt(DIR: string, filename?: string): Promise<void>;
+export declare function SelectUtilityPrompt(DIR: string, filename?: string, options?: any): Promise<void>;

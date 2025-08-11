@@ -45,6 +45,121 @@ export interface ImageOptions extends sharp.JpegOptions, sharp.PngOptions, sharp
  * @property {'jpg' | 'jpeg' | 'png' | 'webp' | 'tiff' | 'gif'}
  */
 export type ImageFormat = 'jpg' | 'jpeg' | 'png' | 'webp' | 'tiff' | 'gif';
+/**
+* ## AioImageProcessor
+*
+* The `AioImageProcessor` class is a powerful tool for manipulating and processing images. It allows you to resize, convert, add watermarks, and set metadata for images. This class extends `AioFileOperation`, providing a robust foundation for file-related operations.
+*
+* ### Features
+*
+* -   **Image Conversion**: Convert images between various formats (JPEG, PNG, WebP, TIFF, GIF).
+* -   **Resizing**: Resize images while maintaining aspect ratio or crop to a square.
+* -   **Watermarking**: Add watermarks to images with customizable position and opacity.
+* -   **Metadata**: Set EXIF metadata such as description, author, copyright, and keywords.
+* -   **Optimization**: Optimize images for web use by reducing file size.
+* -   **Customizable Settings**: Configure default settings for resizing, watermarking, and metadata.
+* -   **Error Handling**: Robust error handling for unsupported formats and missing source files.
+*
+* ### Installation
+*
+* ```bash
+*
+*    npm install sharp
+*
+* ```
+*
+* ### Usage
+*
+* #### Basic Usage
+*
+* ```typescript
+*
+*    import { AioImageProcessor } from './path/to/AioImageProcessor';
+*
+*    async function processImage() {
+*      const imageProcessor = new AioImageProcessor();
+*      await imageProcessor
+*        .img('/path/to/your/image.jpg')
+*        .toImg('/path/to/output/image.png', { resize: true, maxWidth: 800, watermark: true });
+*    }
+*
+*    processImage().catch(console.error);
+*
+* ```
+*
+* #### Setting Custom Settings
+*
+* ```typescript
+*
+*    import { AioImageProcessor } from './path/to/AioImageProcessor';
+*
+*    async function processImage() {
+*      const imageProcessor = new AioImageProcessor();
+*      imageProcessor.settings = {
+*        maxWidth: 600,
+*        metadata: {
+*          description: 'Custom description',
+*          author: 'Custom Author',
+*        },
+*        watermark: {
+*          opacity: 0.7,
+*          position: 'bottom',
+*        },
+*      };
+*      await imageProcessor
+*        .img('/path/to/your/image.jpg')
+*        .toImg('webp', { resize: true, watermark: true });
+*    }
+*
+*    processImage().catch(console.error);
+*
+* ```
+*
+* #### Setting Metadata
+*
+* ```typescript
+*
+*    import { AioImageProcessor } from './path/to/AioImageProcessor';
+*
+*    async function processImage() {
+*      const imageProcessor = new AioImageProcessor();
+*      imageProcessor.metadata = {
+*        description: 'New description',
+*        author: 'New Author',
+*        copyright: '© 2024 New Author',
+*        keywords: ['new', 'image', 'metadata'],
+*      };
+*      await imageProcessor
+*        .img('/path/to/your/image.jpg')
+*        .toImg('/path/to/output/image.jpg', { resize: true, maxWidth: 800 });
+*    }
+*
+*    processImage().catch(console.error);
+*
+* ```
+*
+* #### Setting Watermark
+*
+* ```typescript
+*
+*    import { AioImageProcessor } from './path/to/AioImageProcessor';
+*
+*    async function processImage() {
+*      const imageProcessor = new AioImageProcessor();
+*      imageProcessor.watermark = {
+*        path: '/path/to/new/watermark.png',
+*        opacity: 0.8,
+*      };
+*      await imageProcessor
+*        .img('/path/to/your/image.jpg')
+*        .toImg('/path/to/output/image.jpg', { resize: true, maxWidth: 800, watermark: true });
+*    }
+*
+*    processImage().catch(console.error);
+*
+* ```
+*
+*/
 export declare class AioImageProcessor extends AioFileOperation {
     private _settings;
     private _Sharp;

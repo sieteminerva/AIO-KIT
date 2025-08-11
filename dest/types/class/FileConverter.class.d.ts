@@ -1,9 +1,40 @@
 import { AioFileOperation } from "./FileOperation.class.js";
 /**
- * // TODO
+ * # AioFileConverter
+ *
+ * The `AioFileConverter` class is a versatile utility for handling file conversions between various formats, including JSON, CSV, and YAML. It extends the `AioFileOperation` class, inheriting its file handling capabilities.
+ *
+ * ### Installation
+ *
+ * ```bash
+ *
+ *    npm install json-2-csv yamljs
+ *
+ * ```
+ * ## Features
+ *
+ * -   **JSON Handling**: Read and parse JSON files into JavaScript objects.
+ * -   **CSV Handling**: Read and parse CSV files into arrays of JavaScript objects.
+ * -   **YAML Handling**: Read and parse YAML files into JavaScript objects.
+ * -   **Format Conversion**: Convert between JSON, CSV, and YAML formats.
+ * -   **Method Chaining**: Supports method chaining for fluent API usage.
+ *
+ * ## TODO
  * - markdown to html vise versa
+ *
+ * @see {@link https://www.npmjs.com/package/json-2-csv|json-2-csv}
+ * @see {@link https://www.npmjs.com/package/yamljs|yamljs}
  */
 export declare class AioFileConverter extends AioFileOperation {
+    /**
+    * Converter Options `AioFileConverter` class.
+    *
+    * The options, which specifies option in to the file to be converted.
+    * If `options` is not specified, the converter will run the default way.
+    *
+    * @param {string} [_options] The converted options.
+    */
+    private _options;
     /**
      * Initializes a new instance of the `AioFileConverter` class.
      *
@@ -81,6 +112,13 @@ export declare class AioFileConverter extends AioFileOperation {
      * ```
      */
     yaml(filepath: string): Promise<this>;
+    /**
+     *
+     *
+     * @param {string} filepath
+     * @memberof AioFileConverter
+     */
+    html(filepath: string, usePlaceholder?: boolean): Promise<this>;
     /**
      * Converts the current file content to CSV format.
      *
@@ -162,7 +200,6 @@ export declare class AioFileConverter extends AioFileOperation {
      * ```
      */
     toJson(): this;
-    html(filepath: string): void;
     md(): void;
     toHtml(): void;
     toMd(): void;

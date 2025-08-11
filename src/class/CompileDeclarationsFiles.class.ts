@@ -30,6 +30,7 @@ export class CompileDeclarationsFiles {
   private _targetDirectory: string;
   private _dtsExt: string;
   private _jsExt: string;
+  private _tsExt: string;
   private _outputName: string;
   private _root: string;
 
@@ -51,6 +52,7 @@ export class CompileDeclarationsFiles {
     this._outputName = outputName;
     this._dtsExt = '.d.ts';
     this._jsExt = '.js';
+    this._tsExt = '.ts';
   }
 
   /**
@@ -74,25 +76,48 @@ export class CompileDeclarationsFiles {
    * 
    * ```
    */
-  async run() {
+  async run(): Promise<void> {
     console.log('root', this._root);
 
     const dts = this._outputName + this._dtsExt;
     const js = this._outputName + this._jsExt;
+    const ts = this._outputName + this._tsExt;
 
     const outputFiles = await this.checkOutputFiles(dts, js);
 
     const files = await this.search(this._targetDirectory, this._dtsExt);
-    /** if nothing is found stop the process **/
+    console.log(`[Found Files]: '${files}'`);
+    for (const file of files) {
+      console.log(`[File]: '${file.name}'`);
+      file.parentPath = this._targetDirectory; // Add parent path to the file object
+    }
+
+
+    /** 
+     * TODO create index.d.ts and write extracted fn from found .ts files, rather than istructed user to generate d.ts files manually 
+     * Step:
+     * 1. search all .ts files
+     * 2. alternative 1
+     *  - const tsdocs = await this.concatenateFiles(tsfiles);
+     *  - this.filterFnClass(tsdocs)
+     * 3. alternative 2
+     *  - add // @ts-nocheck on concatenated files
+     *  - run exec npx tsc --declaration --emitDeclarationOnly ${this._targetDirectory}/your_file.ts
+     * 4. re-run the process
+     * 
+     * for now if no .d.ts file is found stop the process
+     */
+
     if (files.length === 0) {
       console.warn(`No ${this._dtsExt} files found in ${this._targetDirectory}`);
+      console.info(`Use [typescript] cli command to generate 'd.ts' file. \n[step 1]: npx tsc --declaration --emitDeclarationOnly ${this._targetDirectory}/your_file.ts \n[step 2]: re-run 'aio publish' command`);
+      // use tsc command to generate index.d.ts
       return;
     }
 
     /** Concatenate all d.ts files **/
     const docs = await this.concatenateFiles(files);
 
-    console.log(`[Writing new]: '${dts}'`);
     await this.write(outputFiles['dts'], docs);
 
     /** Generate index.js with export statement from d.ts files **/
@@ -311,7 +336,7 @@ export class CompileDeclarationsFiles {
     const files = await readdir(directory, { withFileTypes: true, recursive: true, encoding: 'utf-8' });
     /** Filtering the found object and identify it. if it is a file and have the given extension **/
     const targetedFiles = files.filter((file) => {
-      return file.isFile() && file.name.endsWith(ext)
+      return file.isFile() && file.name.endsWith(ext);
     });
     return targetedFiles;
   }

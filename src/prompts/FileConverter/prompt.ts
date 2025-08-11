@@ -13,19 +13,27 @@ import { MainDialogPrompt } from "../main.prompt.js";
  *
  * @param DIR - The current directory path.
  * @param filename - The current filename (not directly used in this function, but passed for consistency).
+ * @param options - The converter options.
  *
  * @example
  * ```typescript
  * await SelectFileConverterPrompt('/path/to/directory', 'example.txt');
+ * await SelectFileConverterPrompt('/path/to/directory', 'example.txt', true);
  * ```
  */
-export async function SelectFileConverterPrompt(DIR: string, filename: string) {
+export async function SelectFileConverterPrompt(DIR: string, filename?: string, options?: any) {
   try {
     const task = await select({
-      message: 'Choose File to Convert',
+      message: 'Choose Converter Task',
       choices: UTIL_TYPES.map((menu) => ({ name: menu.name, value: menu.value })),
     });
     switch (task) {
+      case 'html to json':
+        FileConverterPrompt('.html', '.json');
+        break;
+      case 'yaml to csv':
+        FileConverterPrompt('.yaml', '.csv');
+        break;
       case 'json to csv':
         FileConverterPrompt('.json', '.csv');
         break;
@@ -44,15 +52,14 @@ export async function SelectFileConverterPrompt(DIR: string, filename: string) {
       case 'yaml to csv':
         FileConverterPrompt('.yaml', '.csv');
         break;
-      case 'back':
-        await MainDialogPrompt(DIR);
-        break;
       case 'quit':
         process.exit(0);
     }
+    return task;
   } catch (error) {
     handlePromptError(error);
   } finally {
-    await SelectFileConverterPrompt(DIR, filename)
+    await SelectFileConverterPrompt(DIR, filename, options = false)
   }
 }
+

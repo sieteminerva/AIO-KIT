@@ -134,7 +134,7 @@ export class AioFileOperation {
    * 
    * ```
    */
-  async search(directory: string, ext: string | string[] | undefined, showDir: boolean = false): Promise<Dirent[] | undefined> {
+  async search(directory: string, ext?: string | string[] | undefined, showDir: boolean = false): Promise<Dirent[] | undefined> {
     try {
       const files = await readdir(directory, { withFileTypes: true, recursive: true, encoding: 'utf-8' });
       const targetedFiles = files.filter((file) => {

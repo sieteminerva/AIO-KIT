@@ -24,7 +24,7 @@ import { ImageOptimizerPrompt } from "../ImageProcessor/ImageOptimizer.prompt.js
  * @example
  * // Example usage: SelectUtilityPrompt('/path/to/directory', 'example.txt');
  */
-export async function SelectUtilityPrompt(DIR: string, filename?: string) {
+export async function SelectUtilityPrompt(DIR: string, filename?: string, options?: any) {
 
   try {
 
@@ -42,7 +42,7 @@ export async function SelectUtilityPrompt(DIR: string, filename?: string) {
           await ImageOptimizerPrompt(DIR, filename);
           break;
         case 'file-convert':
-          await SelectFileConverterPrompt(DIR, filename as string);
+          await SelectFileConverterPrompt(DIR, filename as string, options);
           break;
         case 'compile':
           await CompileDeclarationsFilesPrompt(DIR, filename as string);

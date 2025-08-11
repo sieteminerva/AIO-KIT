@@ -148,9 +148,10 @@ aio
   .aliases(['u', 'U', 'util'])
   .option('-p, --path [path]', 'source path location')
   .option('-n, --name [filename]', 'file name')
+  .option('-o, --options [options]', 'file conversion options')
   .description(`${greenBright('[Usage] >>')} Processing File Input`)
   .action((options) => {
-    SelectUtilityPrompt(options.path, options.name);
+    SelectUtilityPrompt(options.path, options.name, options.options);
   });
 
 /**
@@ -193,7 +194,8 @@ aio
  * @param {object} options - The options object.
  * @param {string} [options.name] - The name of the file to be converted.
  * @param {string} [options.path] - The destination path where the converted file will be saved.
- *
+ * @param {string} [options.options] - The file converter options.
+ * 
  * @example
  * ```bash
  * 
@@ -201,6 +203,8 @@ aio
  *    aio file --name myFile.txt --path ./output
  *    // To convert a file named 'data.json' and save it to the current directory:
  *    aio file --name data.json --path .
+ *    // To convert a file named 'template.html' with defined options and save it to the current directory:
+ *    aio file --name html.json --path . --options true
  *    // To start the file converter prompt without specifying a file name or path:
  *    aio file
  * 
@@ -209,11 +213,12 @@ aio
 aio
   .command('file')
   .aliases(['f', 'F'])
-  .option('--name [filename]', 'file name')
-  .option('--path [path]', 'destination path location')
+  .option('-n', '--name [filename]', 'file name')
+  .option('-p', '--path [path]', 'destination path location')
+  .option('-o', '--options [options]', 'file conversion options')
   .description(`${greenBright('[Usage] >>')} Converting File Input to different format.`)
   .action((options) => {
-    SelectFileConverterPrompt(options.path, options.name);
+    SelectFileConverterPrompt(options.path, options.name, options.options);
   });
 
 

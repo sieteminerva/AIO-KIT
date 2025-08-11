@@ -20,7 +20,7 @@ import { ImageOptimizerPrompt } from "../ImageProcessor/ImageOptimizer.prompt.js
  * @example
  * // Example usage: SelectUtilityPrompt('/path/to/directory', 'example.txt');
  */
-export async function SelectUtilityPrompt(DIR, filename) {
+export async function SelectUtilityPrompt(DIR, filename, options) {
     try {
         const task = await select({
             message: 'Choose AIO Utility Task',
@@ -35,7 +35,7 @@ export async function SelectUtilityPrompt(DIR, filename) {
                     await ImageOptimizerPrompt(DIR, filename);
                     break;
                 case 'file-convert':
-                    await SelectFileConverterPrompt(DIR, filename);
+                    await SelectFileConverterPrompt(DIR, filename, options);
                     break;
                 case 'compile':
                     await CompileDeclarationsFilesPrompt(DIR, filename);
