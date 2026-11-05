@@ -1,7 +1,7 @@
 import { json2csv, csv2json } from "json-2-csv";
 import YAML from 'yamljs';
 import { AioFileOperation } from "./FileOperation.class.js";
-import { html2json, html2jsonWithPlaceholder } from "../lib/scripts/html-converter.js";
+import { html2json, html2jsonWithPlaceholder, htmlToMarkdown, markdownToHtml } from "../lib/scripts/html-converter.js";
 /**
  * # AioFileConverter
  *
@@ -148,6 +148,17 @@ export class AioFileConverter extends AioFileOperation {
         return this;
     }
     /**
+     *
+     *
+     * @param {string} filepath
+     * @memberof AioFileConverter
+     */
+    async md(filepath) {
+        this.ext = this._getExtension(filepath);
+        this.content = await this.read(filepath);
+        return this;
+    }
+    /**
      * Converts the current file content to CSV format.
      *
      * This method handles the conversion from JSON or YAML to CSV.
@@ -184,7 +195,13 @@ export class AioFileConverter extends AioFileOperation {
         // run yaml to json then json to csv
         if (this.ext === '.yaml') {
             const json = JSON.parse(JSON.stringify(this.content));
-            const csv = json2csv(json);
+            const csv = json2csv(json, {
+                delimiter: {
+                    field: ",",
+                    wrap: '"',
+                    eol: '\n'
+                }
+            });
             this.content = csv;
         }
         // return csv string `content` ready to write to file
@@ -279,13 +296,30 @@ export class AioFileConverter extends AioFileOperation {
         }
         return this;
     }
-    md() {
-        console.warn('Not Implemented yet!');
-    }
+    /**
+     *
+     *
+     * @return {*}
+     * @memberof AioFileConverter
+     */
     toHtml() {
-        console.warn('Not Implemented yet!');
+        if (this.ext === '.md') {
+            const html = markdownToHtml(this.content);
+            this.content = html;
+        }
+        return this;
     }
+    /**
+     *
+     *
+     * @return {*}
+     * @memberof AioFileConverter
+     */
     toMd() {
-        console.warn('Not Implemented yet!');
+        if (this.ext === '.html') {
+            const md = htmlToMarkdown(this.content);
+            this.content = md;
+        }
+        return this;
     }
 }

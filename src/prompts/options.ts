@@ -1,5 +1,20 @@
 import { yellowBright } from "yoctocolors";
 
+export const BUILD_TYPES = [
+  { name: 'Vite', value: 'vite' },
+  { name: 'Website', value: 'website' },
+  { name: `Back to ${yellowBright('[Start]')}`, value: 'back' },
+  { name: `${yellowBright('[Quit]')}`, value: 'quit' }
+];
+
+export const VITE_PROJECT_TYPES = [
+  { name: 'Google Apps Script', value: 'gas' },
+  { name: 'Website Development', value: 'webdev' },
+  { name: 'Documentation', value: 'docs' },
+  { name: `Back to ${yellowBright('[Start]')}`, value: 'back' },
+  { name: `${yellowBright('[Quit]')}`, value: 'quit' }
+];
+
 export const PROJECT_TYPES = [
   { name: 'Design', value: 'design' },
   { name: 'Website', value: 'website' },
@@ -30,6 +45,7 @@ export const DATA_TYPES = [
   { value: 'place', name: `Place Data` },
   { value: 'todo', name: `To-Do Data` },
   { value: 'article', name: `Article Data` },
+  { value: 'gallery', name: `Gallery Data` },
   // 'userProfile', 'timeManager', 'client', 'matter', 'circular',
   // 'memo', 'minutes', 'progressReport', 'analysisAndEvaluation', 'paperwork', 'summary',
 ];
@@ -60,6 +76,8 @@ export const IMAGE_TASKS = [
 
 export const UTIL_TYPES = [
   { name: 'html to json', value: 'html to json' },
+  { name: 'html to markdown', value: 'html to markdown' },
+  { name: 'markdown to html', value: 'markdown to html' },
   { name: 'json to csv', value: 'json to csv' },
   { name: 'csv to json', value: 'csv to json' },
   { name: 'json to yaml', value: 'json to yaml' },
@@ -103,6 +121,7 @@ export const IMAGE_FORMATS = [
   'webp',
   'gif',
   'tiff',
+  'svg'
 ];
 
 export const WATERMARK_POSITIONS = [

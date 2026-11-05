@@ -4,6 +4,7 @@ import { DataGeneratorPrompt } from './DataGenerator/DataGenerator.prompt.js';
 import { handlePromptError } from './ErrorHandler.prompt.js';
 import { SelectUtilityPrompt } from './Utility/SelectUtility.prompt.js';
 import { TextProcessorPrompt } from './TextProcessor/prompt.js';
+import { SelectBuildPrompt } from './Build/prompts.js';
 import { MAIN_TASKS } from './options.js';
 const DEST_DIR = process.cwd();
 /**
@@ -35,6 +36,9 @@ export async function MainDialogPrompt(DIR, filename, options) {
         switch (menu) {
             case 'project':
                 await CreateProjectPrompt(filename);
+                break;
+            case 'build':
+                await SelectBuildPrompt(DIR);
                 break;
             case 'generator':
                 await DataGeneratorPrompt(DIR, null);

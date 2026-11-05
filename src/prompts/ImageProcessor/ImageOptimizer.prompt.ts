@@ -1,6 +1,7 @@
 import { number, select } from "@inquirer/prompts";
-import { extname, join, resolve } from "path";
-import { greenBright } from "yoctocolors";
+import { dirname, extname, join, resolve } from "path";
+import { writeFile } from "node:fs/promises";
+import { greenBright, red } from "yoctocolors";
 import { AioImageProcessor, ImageOptions } from "../../class/ImageProcessor.class.js";
 import { handlePromptError } from "../ErrorHandler.prompt.js";
 import { SelectImageFilesPrompt } from "./components/SelectImageFiles.prompt.js";
@@ -8,6 +9,8 @@ import { SetWatermarkOptionsPrompt } from "./components/SetWatermark.prompt.js";
 import { SetResizeOptionsPrompt } from "./components/SetResizeOptions.prompt.js";
 import { Dirent } from "fs";
 
+import { SetSvgPresetsPrompt } from "./components/SetSvgPresets.prompt.js";
+import { SvgProcessor } from "../../modules/SvgProcessor.js";
 
 /**
  * Orchestrates the image optimization process, guiding the user through various settings and options.
@@ -43,63 +46,90 @@ export async function ImageOptimizerPrompt(filepath: string, filename: string = 
       message: 'Select Output Image Format:',
       choices: [
         { name: 'webp', value: 'webp' },
-        { name: 'png', value: 'png' }
-
+        { name: 'png', value: 'png' },
+        { name: 'svg', value: 'svg' }
       ]
     });
 
     // search for images in `process.cwd()` with filtered extensions
-    const imageToSearch = ['.jpeg', '.jpg', '.png', '.webp', '.gif', '.tiff'];
+    const imageToSearch = imageOutputFormat === 'svg' ? ['.svg'] : ['.jpeg', '.jpg', '.png', '.webp', '.gif', '.tiff'];
     const folder = await converter.search(DIR, imageToSearch, false) as Dirent[];
     const fileSelected = await SelectImageFilesPrompt(folder);
 
-    // set `Resize` options
-    const resizeOptions = await SetResizeOptionsPrompt();
+    if (!fileSelected) {
+      return;
+    }
 
-    // set `Watermark` options
-    const watermarkOptions = await SetWatermarkOptionsPrompt();
+    if (imageOutputFormat !== "svg") {
 
-    Object.assign(options, watermarkOptions, resizeOptions);
+      // set `Resize` options
+      const resizeOptions = await SetResizeOptionsPrompt();
 
-    // set image `Quality`
-    options.quality = await number({
-      message: 'the `Image Quality` is set to 70, do you need to change it? (1-100)',
+      // set `Watermark` options
+      const watermarkOptions = await SetWatermarkOptionsPrompt();
 
-      default: 70,
-    });
+      Object.assign(options, watermarkOptions, resizeOptions);
 
-    if (Array.isArray(fileSelected) && fileSelected.length > 0) {
-      for (const filepath of fileSelected) {
-        // convert extension to format
-        const ext = extname(filepath).slice(1);
+      // set image `Quality`
+      options.quality = await number({
+        message: 'the `Image Quality` is set to 70, do you need to change it? (1-100)',
+        default: 70,
+      });
 
-        // set the optimization options
-        if (ext === 'jpeg' || ext === 'jpg') {
-          options.mozjpeg = true;
-          options.progressive = true;
-        } else if (ext === 'png' || imageOutputFormat === 'png') {
-          options.compressionLevel = 8;
-          options.progressive = true;
-          options.force = imageOutputFormat === 'png' ? true : false;
-        } else if (ext === 'webp' || imageOutputFormat === 'webp') {
-          options.nearLossless = true;
-          options.effort = 6;
-          options.force = imageOutputFormat === 'webp' ? true : false;
+      if (Array.isArray(fileSelected) && fileSelected.length > 0) {
+        console.clear();
+        for (const filepath of fileSelected) {
+          // convert extension to format
+          const ext = extname(filepath).slice(1);
+
+          // set the optimization options
+          if (ext === 'jpeg' || ext === 'jpg') {
+            options.mozjpeg = true;
+            options.progressive = true;
+          } else if (ext === 'png' || imageOutputFormat === 'png') {
+            options.compressionLevel = 8;
+            options.progressive = true;
+            options.force = imageOutputFormat === 'png' ? true : false;
+          } else if (ext === 'webp' || imageOutputFormat === 'webp') {
+            options.nearLossless = true;
+            options.effort = 6;
+            options.force = imageOutputFormat === 'webp' ? true : false;
+          }
+
+          // console.log('filepath input =>', filepath);
+          await converter.img(filepath).toImg(imageOutputFormat as any, options);
+
         }
 
-        // console.log('filepath input =>', filepath);
-        await converter.img(filepath).toImg(imageOutputFormat as any, options);
-
+        const msg = greenBright(`${fileSelected.length} files successfully converted.`);
+        console.log(msg);
+      } else {
+        return;
       }
 
-      const msg = greenBright(`${fileSelected.length} files successfully converted.`);
-      console.log(msg);
+    } else if (imageOutputFormat === 'svg') {
+
+      const svgOptions = await SetSvgPresetsPrompt();
+      if (Array.isArray(fileSelected) && fileSelected.length > 0) {
+        const cssFilePath = resolve(join(dirname(fileSelected[0]), 'aio-icon.css'));
+        svgOptions.cssOutputPath = cssFilePath;
+        await writeFile(cssFilePath, '', 'utf8');
+
+        console.clear();
+        const svgProcessor = new SvgProcessor();
+        svgProcessor.cleanDir("optimized");
+        for (const filepath of fileSelected) {
+          await svgProcessor.process(filepath, svgOptions);
+        }
+        const msg = greenBright(`${fileSelected.length} SVG files successfully optimized and collected into aio-icon.css.`);
+        console.log(msg);
+      } else {
+        console.log(red('No SVG files selected for optimization.'));
+        return;
+      }
     }
 
   } catch (error) {
-
     handlePromptError(error);
-  } finally {
-    await ImageOptimizerPrompt(filepath, filename);
   }
 }

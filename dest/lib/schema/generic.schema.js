@@ -18,6 +18,7 @@ export function createSchema() {
     const todo = createTodo;
     const place = createPlace;
     const article = createArticle;
+    const gallery = createGallery;
     const custom = createCustom;
     return {
         address,
@@ -25,6 +26,7 @@ export function createSchema() {
         todo,
         place,
         article,
+        gallery,
         custom,
     };
 }
@@ -162,11 +164,51 @@ export function createPlace() {
  * // { title: 'Voluptatem et ut.', category: 'Renungan Harian', content: 'Quia et et. \n \r Autem et et.', likes: 1234, author: 'Jayson Wintheiser' }
  * ```
  */
-export function createArticle() {
+export function createArticle2() {
     return {
         title: faker.lorem.sentence(),
         category: faker.helpers.arrayElement(['Lagu Rohani', 'Renungan Harian', 'Kotbah', 'Kesaksian', 'Inspirasi', 'Renungan']),
         content: faker.lorem.paragraphs(2, "\n \r"),
+        likes: faker.number.int({ min: 5, max: 2550 }),
+        author: faker.person.fullName(),
+    };
+}
+;
+export function generateRandomColor(Options, alpha, ColorSets) {
+    const defaultColorSets = ColorSets ? ColorSets : [
+        '#ff3700', '#ef9b26', '#fcf014', '#6cfc14', '#14f4fc',
+        '#ac68ff', '#ff68d6', '#c9b7ff', '#2d8afc', '#f6b2ff'
+    ];
+    const randomColor = defaultColorSets[Math.floor(Math.random() * defaultColorSets.length)];
+    return randomColor;
+}
+export function createArticle() {
+    const title = faker.lorem.sentence({ min: 3, max: 6 });
+    const slug = title.replace(".", "").split(" ").join("-");
+    const img = `https://placehold.co/300x300/4f3274/${generateRandomColor().replace("#", "")}?text=${title.replace(".", "")}`;
+    return {
+        title,
+        slug,
+        summary: faker.lorem.sentence({ min: 10, max: 25 }),
+        body: faker.lorem.paragraphs(2, "\n \r"),
+        thumbnail: img,
+        largeCover: img,
+        date: new Date(faker.date.future({ years: 1, refDate: new Date() })).toDateString(),
+        category: faker.helpers.arrayElement(['Lagu Rohani', 'Renungan Harian', 'Kotbah', 'Kesaksian', 'Inspirasi', 'Renungan']),
+        likes: faker.number.int({ min: 5, max: 2550 }),
+        author: faker.person.fullName(),
+    };
+}
+;
+export function createGallery() {
+    const title = faker.lorem.sentence({ min: 3, max: 6 });
+    const img = `https://placehold.co/300x300/4f3274/${generateRandomColor().replace("#", "")}?text=${title.replace(".", "")}`;
+    return {
+        title,
+        description: faker.lorem.sentence({ min: 10, max: 25 }),
+        imageUrl: img,
+        date: new Date(faker.date.future({ years: 1, refDate: new Date() })).toDateString(),
+        category: faker.helpers.arrayElement(['Pemandangan', 'Pre Wedding', 'Producr', 'Modelling', 'Random', 'Animal']),
         likes: faker.number.int({ min: 5, max: 2550 }),
         author: faker.person.fullName(),
     };

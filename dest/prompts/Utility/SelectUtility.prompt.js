@@ -22,6 +22,8 @@ import { ImageOptimizerPrompt } from "../ImageProcessor/ImageOptimizer.prompt.js
  */
 export async function SelectUtilityPrompt(DIR, filename, options) {
     try {
+        // Clear Console before executing select AIO Utility task 
+        console.clear();
         const task = await select({
             message: 'Choose AIO Utility Task',
             choices: UTILITY_TASKS.map((task) => ({ name: task.name, value: task.value })),
@@ -47,11 +49,9 @@ export async function SelectUtilityPrompt(DIR, filename, options) {
                     process.exit(0);
             }
         }
+        return task;
     }
     catch (error) {
         handlePromptError(error);
-    }
-    finally {
-        await SelectUtilityPrompt(DIR, filename);
     }
 }

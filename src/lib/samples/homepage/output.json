@@ -1,0 +1,431 @@
+[
+  {
+    "name": "Hero",
+    "tagName": "section",
+    "id": "hero-section",
+    "className": "section row align-mid stackable",
+    "options": {
+      "fieldTypes": {
+        "selector": {
+          "p.eyebrow": "text",
+          "h2.title": "text",
+          "p.description": "textarea"
+        },
+        "property": {
+          "title": "text",
+          "image": "file",
+          "description": "textarea"
+        }
+      }
+    },
+    "content": [
+      {
+        "tagName": "div",
+        "className": "column half",
+        "content": [
+          {
+            "tagName": "p",
+            "className": "eyebrow",
+            "content": "Private Trip Keluarga • Kepulauan Seribu"
+          },
+          {
+            "tagName": "h2",
+            "className": "title",
+            "content": "Liburan laut yang tenang dan privat."
+          },
+          {
+            "tagName": "p",
+            "className": "description",
+            "content": "Kami menyusun perjalanan keluarga ke pulau impian dengan itinerary yang jelas, fasilitas yang nyaman, dan dukungan tim lokal yang siap membantu setiap langkahnya."
+          }
+        ]
+      },
+      {
+        "tag": "div",
+        "id": "carousel-container",
+        "className": "column half",
+        "builder": "carousel",
+        "options": {
+          "mode": "table"
+        },
+        "content": [
+          {
+            "title": "Eksplorasi Keindahan",
+            "description": "Nikmati perjalanan privat yang nyaman dan tenang bersama keluarga.",
+            "image": "https://placehold.co/640x420/1e3a5f/ffffff?text=Kepulauan+Seribu"
+          },
+          {
+            "title": "Pantai Pasir Putih",
+            "description": "Menghabiskan waktu dengan pemandangan sunset yang luar biasa.",
+            "image": "https://placehold.co/640x420/8764b5/ffffff?text=Pantai+Pasir+Putih"
+          },
+          {
+            "title": "Aktivitas Menyenangkan",
+            "description": "Snorkeling dan aktivitas air lain yang disesuaikan untuk semua umur.",
+            "image": "https://placehold.co/640x420/3c2554/ffffff?text=Petualangan+Seru"
+          },
+          {
+            "title": "Eksplorasi Keindahan",
+            "description": "Nikmati perjalanan privat yang nyaman dan tenang bersama keluarga.",
+            "image": "https://placehold.co/640x420/1e3a5f/ffffff?text=Kepulauan+Seribu"
+          },
+          {
+            "title": "Pantai Pasir Putih",
+            "description": "Menghabiskan waktu dengan pemandangan sunset yang luar biasa.",
+            "image": "https://placehold.co/640x420/8764b5/ffffff?text=Pantai+Pasir+Putih"
+          },
+          {
+            "title": "Aktivitas Menyenangkan",
+            "description": "Snorkeling dan aktivitas air lain yang disesuaikan untuk semua umur.",
+            "image": "https://placehold.co/640x420/3c2554/ffffff?text=Petualangan+Seru"
+          },
+          {
+            "title": "Eksplorasi Keindahan",
+            "description": "Nikmati perjalanan privat yang nyaman dan tenang bersama keluarga.",
+            "image": "https://placehold.co/640x420/1e3a5f/ffffff?text=Kepulauan+Seribu"
+          },
+          {
+            "title": "Pantai Pasir Putih",
+            "description": "Menghabiskan waktu dengan pemandangan sunset yang luar biasa.",
+            "image": "https://placehold.co/640x420/8764b5/ffffff?text=Pantai+Pasir+Putih"
+          },
+          {
+            "title": "Aktivitas Menyenangkan",
+            "description": "Snorkeling dan aktivitas air lain yang disesuaikan untuk semua umur.",
+            "image": "https://placehold.co/640x420/3c2554/ffffff?text=Petualangan+Seru"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Stats",
+    "id": "stats-section",
+    "tagName": "section",
+    "options": {
+      "fieldTypes": {
+        "selector": {
+          "p.eyebrow": "text",
+          ".rating": "text",
+          ".description": "textarea"
+        }
+      }
+    },
+    "content": [
+      {
+        "className": "column full compact",
+        "content": {
+          "tagName": "p",
+          "className": "eyebrow",
+          "content": "Keunggulan perusahaan"
+        }
+      },
+      {
+        "className": "row card",
+        "options": {
+          "mode": "table"
+        },
+        "content": [
+          {
+            "className": "column stat",
+            "content": [
+              {
+                "tagName": "strong",
+                "className": "rating",
+                "content": "4.9/5"
+              },
+              {
+                "tagName": "span",
+                "className": "description",
+                "content": "rating keluarga yang telah berangkat"
+              }
+            ]
+          },
+          {
+            "className": "column stat",
+            "content": [
+              {
+                "tagName": "strong",
+                "className": "rating",
+                "content": "24/7"
+              },
+              {
+                "tagName": "span",
+                "className": "description",
+                "content": "support lapangan dan koordinasi darurat"
+              }
+            ]
+          },
+          {
+            "className": "column stat",
+            "content": [
+              {
+                "tagName": "strong",
+                "className": "rating",
+                "content": "100%"
+              },
+              {
+                "tagName": "span",
+                "className": "description",
+                "content": "tim lokal asal pulau dan kru yang terpercaya"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "About",
+    "id": "about-section",
+    "tagName": "section",
+    "className": "row card",
+    "content": [
+      {
+        "tagName": "div",
+        "className": "column half",
+        "content": [
+          {
+            "tagName": "p",
+            "className": "eyebrow",
+            "content": "Tentang Kami"
+          },
+          {
+            "tagName": "h2",
+            "className": "title",
+            "content": "Operator lokal resmi yang menggabungkan kenyamanan, ketepatan, dan sentuhan personal."
+          },
+          {
+            "tagName": "p",
+            "className": "description",
+            "content": "Kami merancang setiap trip dengan memperhatikan kebutuhan keluarga: jadwal yang tidak terburu-buru, fasilitas yang aman, dan pengalaman yang terasa hangat serta berkesan."
+          }
+        ]
+      },
+      {
+        "tagName": "div",
+        "className": "column half",
+        "content": [
+          {
+            "tagName": "img",
+            "className": "img-fluid",
+            "src": "https://placehold.co/720x420/8764b5/ffffff?text=Tim+Lokal"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Benefit",
+    "id": "benefit-section",
+    "className": "row",
+    "tagName": "section",
+    "options": {
+      "fieldTypes": {
+        "selector": {
+          "h3.title": "text",
+          "p.description": "textarea"
+        }
+      }
+    },
+    "content": [
+      {
+        "name": "Kenapa Memilih Kami",
+        "id": "benefits-section",
+        "className": "column card",
+        "options": {
+          "mode": "table"
+        },
+        "content": [
+          {
+            "tagName": "div",
+            "className": "row",
+            "content": [
+              {
+                "tagName": "h3",
+                "className": "title",
+                "content": "Trip privat"
+              },
+              {
+                "tagName": "p",
+                "className": "description",
+                "content": "Trip privat dan tidak digabungkan dengan kelompok lain."
+              }
+            ]
+          },
+          {
+            "tagName": "div",
+            "className": "row",
+            "content": [
+              {
+                "tagName": "h3",
+                "className": "title",
+                "content": "Harga jelas"
+              },
+              {
+                "tagName": "p",
+                "className": "description",
+                "content": "Estimasi harga yang jelas sebelum pembayaran."
+              }
+            ]
+          },
+          {
+            "tagName": "div",
+            "className": "row",
+            "content": [
+              {
+                "tagName": "h3",
+                "className": "title",
+                "content": "Support penuh"
+              },
+              {
+                "tagName": "p",
+                "className": "description",
+                "content": "Tim lapangan yang siap membantu dari keberangkatan hingga kembali."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Rencana Perjalanan",
+        "id": "itinerary-section",
+        "className": "column card",
+        "options": {
+          "mode": "table"
+        },
+        "content": [
+          {
+            "tagName": "div",
+            "className": "row",
+            "content": [
+              {
+                "tagName": "h3",
+                "className": "title",
+                "content": "1. Persiapan & Keberangkatan"
+              },
+              {
+                "tagName": "p",
+                "className": "description",
+                "content": "Koordinasi yang jelas, jadwal kumpul yang rapi, dan transportasi yang sudah dipilih sesuai kebutuhan."
+              }
+            ]
+          },
+          {
+            "tagName": "div",
+            "className": "row",
+            "content": [
+              {
+                "tagName": "h3",
+                "className": "title",
+                "content": "2. Aktivitas di Pulau"
+              },
+              {
+                "tagName": "p",
+                "className": "description",
+                "content": "Snorkeling, santai di pantai, sunset, dan pilihan add-ons yang dapat disesuaikan dengan usia anggota keluarga."
+              }
+            ]
+          },
+          {
+            "tagName": "div",
+            "className": "row",
+            "content": [
+              {
+                "tagName": "h3",
+                "className": "title",
+                "content": "3. Kembali dengan Kenangan"
+              },
+              {
+                "tagName": "p",
+                "className": "description",
+                "content": "Semua dokumen, tiket, dan informasi trip akan dikirimkan dengan rapi untuk memudahkan perjalanan pulang."
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "CTA",
+    "section#cta-section.section.banner": {
+      "content": {
+        "h2.title": {
+          "content": "Siap merancang liburan keluarga yang nyaman?"
+        },
+        "div.actions": {
+          "onCreated": "CREATE_MODAL"
+        }
+      }
+    }
+  },
+  {
+    "name": "Trust",
+    "id": "trust-section",
+    "tagName": "section",
+    "className": "row card transparent",
+    "content": [
+      {
+        "tagName": "p",
+        "className": "eyebrow",
+        "content": "Keamanan & Kepercayaan"
+      },
+      {
+        "tagName": "h2",
+        "className": "title",
+        "content": "Semua titik perjalanan kami dikelola dengan perhatian pada keamanan dan kenyamanan."
+      },
+      {
+        "tagName": "p",
+        "className": "description",
+        "content": "Nomor kontak darurat, manifest data penumpang, dan dokumentasi trip kami siapkan dengan detail sehingga Kakak bisa berangkat dengan tenang."
+      }
+    ]
+  },
+  {
+    "name": "FAQ",
+    "id": "faq-section",
+    "tagName": "section",
+    "className": "row",
+    "options": {
+      "fieldTypes": {
+        "selector": {
+          "h2.title": "text"
+        },
+        "property": {
+          "title": "text",
+          "description": "textarea"
+        }
+      }
+    },
+    "content": [
+      {
+        "tagName": "h2",
+        "className": "title txt-center",
+        "content": "Pertanyaan Populer (FAQ)"
+      },
+      {
+        "className": "column full compact",
+        "builder": "accordion",
+        "options": {
+          "mode": "table"
+        },
+        "content": [
+          {
+            "title": "Apakah ada batas minimal peserta untuk booking?",
+            "description": "Tidak. Kami siap membantu rombongan kecil maupun besar, dan kami akan menyesuaikan paket sesuai kebutuhan Kakak."
+          },
+          {
+            "title": "Apakah bisa reschedule jika cuaca buruk?",
+            "description": "Ya. Jika operasional dibatalkan karena faktor cuaca atau otoritas pelabuhan, kami akan membantu penjadwalan ulang dengan transparan."
+          },
+          {
+            "title": "Apakah pembayaran bisa melalui QRIS?",
+            "description": "Ya. Kami mendukung pembayaran QRIS dan akan langsung mengonfirmasi status transaksi setelah pembayaran berhasil."
+          }
+        ]
+      }
+    ]
+  }
+]

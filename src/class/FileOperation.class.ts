@@ -1,5 +1,5 @@
 import { FileHandle, readdir, open, writeFile, rm, readFile, mkdir } from "node:fs/promises";
-import { Dirent, existsSync } from "node:fs";
+import { Dirent, existsSync, rmdirSync, rmSync } from "node:fs";
 import { basename, extname } from "node:path";
 
 export class AioFileOperation {
@@ -87,6 +87,19 @@ export class AioFileOperation {
     }
   }
 
+
+  public async cleanDir(dir: string): Promise<void> {
+    try {
+      if (existsSync(dir)) {
+        rmdirSync(dir, { recursive: true });
+      }
+      await mkdir(dir, { recursive: true });
+    } catch (error) {
+      console.error(`Error creating directory ${dir}:`, error);
+      throw error;
+    }
+  }
+
   /**
    * Opens a file at the specified path and returns a file handle.
    *
@@ -138,6 +151,7 @@ export class AioFileOperation {
     try {
       const files = await readdir(directory, { withFileTypes: true, recursive: true, encoding: 'utf-8' });
       const targetedFiles = files.filter((file) => {
+
         if (!file.isFile()) {
           return showDir; // Exclude directories
         }
@@ -153,8 +167,15 @@ export class AioFileOperation {
 
         return file.name.includes('.'); // Include all files if no extension is specified
       });
+
+      if (targetedFiles.length === 0) {
+        console.warn(`No ${ext || ""} files found in ${directory}`);
+        return;
+      }
+
       return targetedFiles;
-    } catch (error: unknown) {
+
+    } catch (error: any) {
       if (error instanceof Error && (error as any).code === 'ENOENT') {
         console.warn(`No such file or directory: ${directory}`);
       } else {
@@ -227,7 +248,7 @@ export class AioFileOperation {
    * 
    * ```
    */
-  async write(outputFilePath: string, content: string[]): Promise<void> {
+  async write(outputFilePath: string, content: string[] | string): Promise<void> {
     await writeFile(outputFilePath, content, 'utf-8');
   }
 

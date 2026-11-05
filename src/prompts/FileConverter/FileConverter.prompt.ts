@@ -1,5 +1,5 @@
 import { checkbox } from "@inquirer/prompts";
-import { greenBright, yellowBright } from "yoctocolors";
+import { gray, greenBright, yellowBright } from "yoctocolors";
 import { extname, join } from "path";
 import { AioFileConverter } from "../../class/FileConverter.class.js";
 import { handlePromptError } from "../ErrorHandler.prompt.js";
@@ -25,8 +25,12 @@ export async function FileConverterPrompt(fromExt: string, toExt: string, option
     const converter = new AioFileConverter();
     const folder = await converter.search(DIR) as Dirent[];
     // console.log(`Found files:`, folder); // Debugging
+
+    // Clear console before executing checkbox file selector
+    // console.clear();
+
     const fileSelected = await checkbox({
-      message: 'Select files to convert\n',
+      message: 'Select file(s) to convert\n',
       choices: folder.map(file => ({ name: file.name, value: join(file.parentPath, file.name) })),
       validate(choices) {
         return converterFilesValidation(choices as any, fromExt);
@@ -34,6 +38,7 @@ export async function FileConverterPrompt(fromExt: string, toExt: string, option
     });
     if (Array.isArray(fileSelected) && fileSelected.length > 0) {
       // console.log('File Selected : ', fileSelected);
+      console.clear();
       for (const filepath of fileSelected) {
         let file;
 
@@ -47,6 +52,9 @@ export async function FileConverterPrompt(fromExt: string, toExt: string, option
             break;
           case '.html':
             file = await converter.html(filepath, options);
+            break;
+          case '.md':
+            file = await converter.md(filepath);
             break;
           default:
             file = await converter.json(filepath);
@@ -63,23 +71,28 @@ export async function FileConverterPrompt(fromExt: string, toExt: string, option
           case '.json':
             file.toJson();
             break;
-          case 'quit':
-            process.exit(0);
+          case '.md':
+            file.toMd();
+            break;
+          case '.html':
+            file.toHtml();
+            break;
         }
         // console.log(`=== csv:`, file.content); //Debugging
         await converter.write(filepath.replace(fromExt, toExt), file.content as any);
+
+        const msg2 = gray(`${filepath}`)
+        console.log('Converting:', msg2);
       };
     }
-    console.clear();
-    const msg = greenBright(`\n\n${fileSelected.length} files successfully converted to '${toExt}'`);
-    const msg2 = yellowBright(`\nSelect Another One or 'Ctrl + C' to Quit to End the Process!`)
+    const msg = greenBright(`${fileSelected.length} file(s) successfully converted to '${toExt}'`);
+    const msg2 = yellowBright(`\n\nSelect another files or 'Ctrl + C' to Quit!\n`)
     console.log(msg, msg2);
     return fileSelected;
-
   } catch (error) {
     handlePromptError(error);
   } finally {
-    await FileConverterPrompt(fromExt, toExt);
+    await FileConverterPrompt(fromExt, toExt)
   }
 }
 

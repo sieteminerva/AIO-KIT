@@ -1,0 +1,90 @@
+{
+  "status": "success",
+  "meta": {
+    "type": {
+      "node": "SELECTOR_TO_ELEMENT"
+    },
+    "currentPage": 1,
+    "perPage": 5,
+    "totalItems": 25,
+    "totalPages": 5,
+    "links": {
+      "first": "https://google.com",
+      "prev": null,
+      "self": "https://google.com",
+      "next": "https://google.com",
+      "last": "https://google.com"
+    }
+  },
+  "data": [
+    {
+      "uid": "gallery-intro-001",
+      "category": "eyebrow",
+      "title": "Galeri",
+      "node": ".column.full.txt-center>p.eyebrow",
+      "section": "intro",
+      "timestamp": ""
+    },
+    {
+      "uid": "gallery-intro-002",
+      "category": "title",
+      "title": "Momen Tak Terlupakan Bersama Kami",
+      "node": ".column.full.txt-center>h2.title",
+      "section": "intro",
+      "timestamp": ""
+    },
+    {
+      "uid": "gallery-intro-003",
+      "category": "description",
+      "title": "Lihat pengalaman liburan keluarga yang telah mempercayakan perjalanannya bersama SeribuTrip.",
+      "node": ".column.full.txt-center>p.description",
+      "section": "intro",
+      "timestamp": ""
+    },
+    {
+      "uid": "gallery-001",
+      "imageUrl": "https://placehold.co/600x800/8764b5/ffffff?text=Pantai",
+      "category": "A",
+      "title": "",
+      "description": "",
+      "section": "product",
+      "timestamp": ""
+    },
+    {
+      "uid": "gallery-002",
+      "imageUrl": "https://placehold.co/800x600/1e3a5f/ffffff?text=Snorkeling",
+      "category": "A",
+      "title": "",
+      "description": "",
+      "section": "product",
+      "timestamp": ""
+    },
+    {
+      "uid": "gallery-003",
+      "imageUrl": "https://placehold.co/600x400/8764b5/ffffff?text=Sunset",
+      "category": "B",
+      "title": "",
+      "description": "",
+      "section": "product",
+      "timestamp": ""
+    },
+    {
+      "uid": "gallery-004",
+      "imageUrl": "https://placehold.co/400x600/1e3a5f/ffffff?text=Keluarga",
+      "category": "C",
+      "title": "",
+      "description": "",
+      "section": "product",
+      "timestamp": ""
+    },
+    {
+      "uid": "gallery-005",
+      "imageUrl": "https://placehold.co/800x800/8764b5/ffffff?text=Pemandangan",
+      "category": "A",
+      "title": "",
+      "description": "",
+      "section": "product",
+      "timestamp": ""
+    }
+  ]
+}

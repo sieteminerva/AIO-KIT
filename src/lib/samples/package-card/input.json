@@ -1,0 +1,143 @@
+{
+  "status": "success",
+  "meta": {
+    "type": {
+      "content": "ARRAY_CHILD_KEY",
+      "node": "SELECTOR_TO_ELEMENT"
+    },
+    "rendering": {
+      "dashboard": "mode#table",
+      "builder": "pricing-card",
+      "isRoot": true,
+      "fieldTypes": {
+        "selector": {
+          ".eyebrow": "text",
+          ".title": "text",
+          "p.description": "textarea"
+        }
+      }
+    },
+    "currentPage": 1,
+    "perPage": 5,
+    "totalItems": 25,
+    "totalPages": 5,
+    "links": {
+      "first": "https://google.com",
+      "prev": null,
+      "self": "https://google.com",
+      "next": "https://google.com",
+      "last": "https://google.com"
+    }
+  },
+  "data": [
+    {
+      "uid": "package-card-intro-001",
+      "category": "eyebrow",
+      "title": "Paket Liburan",
+      "node": ".column.full.txt-center>p.eyebrow",
+      "section": "intro",
+      "actions": "ORDER_ACTION",
+      "timestamp": ""
+    },
+    {
+      "uid": "package-card-intro-002",
+      "category": "eyebrow",
+      "title": "Pilih Paket Sesuai Kebutuhan Keluarga Anda",
+      "node": ".column.full.txt-center>h2.title",
+      "section": "intro",
+      "actions": "ORDER_ACTION",
+      "timestamp": ""
+    },
+    {
+      "uid": "package-card-intro-003",
+      "category": "title",
+      "title": "Temukan opsi perjalanan yang paling pas untuk keluarga Anda dengan berbagai pilihan fasilitas dan aktivitas seru.",
+      "node": ".column.full.txt-center>p.description",
+      "section": "intro",
+      "actions": "ORDER_ACTION",
+      "timestamp": ""
+    },
+    {
+      "uid": "package-card-001",
+      "title": "Standard",
+      "section": "product",
+      "price": 450000,
+      "content": "package-card-item-001, package-card-item-002, package-card-item-003, package-card-item-004, package-card-item-005, package-card-item-006, package-card-item-007"
+    },
+    {
+      "uid": "package-card-002",
+      "title": "Medium",
+      "section": "product",
+      "price": 850000,
+      "content": "package-card-item-007, package-card-item-002, package-card-item-003, package-card-item-004, package-card-item-005",
+      "node": ".is-featured"
+    },
+    {
+      "uid": "package-card-003",
+      "title": "Premium",
+      "section": "product",
+      "price": 1500000,
+      "content": "package-card-item-007, package-card-item-009, package-card-item-010"
+    },
+    {
+      "uid": "package-card-item-001",
+      "title": "Kapal Kayu Tradisional",
+      "section": "product item",
+      "node": ".item"
+    },
+    {
+      "uid": "package-card-item-002",
+      "title": "Standard Shared Homestay",
+      "section": "product item",
+      "node": ".item"
+    },
+    {
+      "uid": "package-card-item-003",
+      "title": "Snorkeling Session",
+      "section": "product item",
+      "node": ".item"
+    },
+    {
+      "uid": "package-card-item-004",
+      "title": "Island Adventure Tour",
+      "section": "product item",
+      "node": ".item"
+    },
+    {
+      "uid": "package-card-item-005",
+      "title": "Banana Boat & Jet Ski",
+      "section": "product item",
+      "node": ".item"
+    },
+    {
+      "uid": "package-card-item-006",
+      "title": "Dokumentasi Udara Drone",
+      "section": "product item",
+      "node": ".item"
+    },
+    {
+      "uid": "package-card-item-007",
+      "title": "Speedboat Kilat (Ancol)",
+      "section": "product item",
+      "node": ".item"
+    },
+    {
+      "uid": "package-card-item-08",
+      "title": "Underwater Photo",
+      "section": "product item",
+      "node": ".item"
+    },
+    {
+      "uid": "package-card-item-09",
+      "title": "Exclusive Private House",
+      "section": "product item",
+      "node": ".item"
+    },
+    {
+      "uid": "package-card-item-10",
+      "title": "Paddle Surfing",
+      "section": "product item",
+      "node": ".item"
+    }
+  ]
+}

@@ -1,0 +1,414 @@
+{
+  "status": "success",
+  "meta": {
+    "type": {
+      "content": "ARRAY_CHILD_KEY",
+      "node": "SELECTOR_TO_ELEMENT"
+    },
+    "rendering": {
+      "isRoot": true,
+      "fieldTypes": {
+        "selector": {
+          ".eyebrow": "text",
+          ".title": "text",
+          "p.description": "textarea"
+        }
+      }
+    },
+    "currentPage": 1,
+    "perPage": 5,
+    "totalItems": 25,
+    "totalPages": 5,
+    "links": {
+      "first": "https://google.com",
+      "prev": null,
+      "self": "https://google.com",
+      "next": "https://google.com",
+      "last": "https://google.com"
+    }
+  },
+  "data": [
+    {
+      "uid": "h-001",
+      "category": "container",
+      "title": "Hero",
+      "node": "section#hero-section.section.row.align-mid.stackable",
+      "section": "hero",
+      "content": "h-001-c001, h-001-c002, h-001-c003, h-001-c004",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-001_c001",
+      "category": "eyebrow",
+      "title": "Private Trip Keluarga • Kepulauan Seribu",
+      "node": ".column.half$1>p.eyebrow",
+      "section": "hero",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-001_c002",
+      "category": "title",
+      "title": "Liburan laut yang tenang dan privat.",
+      "node": ".column.half$1>h2.title",
+      "section": "hero",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-001_c003",
+      "category": "description",
+      "title": "Kami menyusun perjalanan keluarga ke pulau impian dengan itinerary yang jelas, fasilitas yang nyaman, dan dukungan tim lokal yang siap membantu setiap langkahnya.",
+      "node": ".column.half$1>p.description",
+      "section": "hero",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-001_c004",
+      "section": "hero",
+      "node": ".column.half$2@carousel",
+      "category": "carousel",
+      "content": "h-001_c004_gc001, h-001_c004_gc002, h-001_c004_gc003"
+    },
+    {
+      "uid": "h-001_c004_gc001",
+      "section": "hero",
+      "title": "Eksplorasi Keindahan",
+      "description": "Nikmati perjalanan privat yang nyaman dan tenang bersama keluarga.",
+      "imageUrl": "https://placehold.co/640x420/1e3a5f/ffffff?text=Kepulauan+Seribu"
+    },
+    {
+      "uid": "h-001_c004_gc002",
+      "section": "hero",
+      "title": "Pantai Pasir Putih",
+      "description": "Menghabiskan waktu dengan pemandangan sunset yang luar biasa.",
+      "imageUrl": "https://placehold.co/640x420/8764b5/ffffff?text=Pantai+Pasir+Putih"
+    },
+    {
+      "uid": "h-001_c004_gc003",
+      "section": "hero",
+      "title": "Aktivitas Menyenangkan",
+      "description": "Snorkeling dan aktivitas air lain yang disesuaikan untuk semua umur.",
+      "imageUrl": "https://placehold.co/640x420/3c2554/ffffff?text=Petualangan+Seru"
+    },
+    {
+      "uid": "h-002",
+      "category": "container",
+      "title": "Statistic",
+      "node": "section#stats-section.column.full.compact",
+      "section": "statistic",
+      "content": "h-002-c001, h-002-c002",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-002_c001",
+      "category": "eyebrow",
+      "title": "Keunggulan perusahaan",
+      "node": ".column.full.compact>p.eyebrow",
+      "section": "statistic",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-002_c002",
+      "category": "container",
+      "title": "container rating",
+      "node": ".row.card",
+      "section": "statistic",
+      "content": "h-002_c002_gc001, h-002_c002_gc002, h-002_c002_gc003, h-002_c002_gc004",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-002_c002_gc001",
+      "category": "statistic item",
+      "title": "4.9/5",
+      "node": ".column.stat$1>strong.rating",
+      "section": "statistic",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-002_c002_gc002",
+      "category": "statistic item",
+      "title": "rating keluarga yang telah berangkat",
+      "node": ".column.stat$1>span.description",
+      "section": "statistic",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-002_c002_gc003",
+      "category": "statistic item",
+      "title": "24/7",
+      "node": ".column.stat$2>strong.rating",
+      "section": "statistic",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-002_c002_gc004",
+      "category": "statistic item",
+      "title": "support lapangan dan koordinasi darurat",
+      "node": ".column.stat$2>span.description",
+      "section": "statistic",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-002_c002_gc005",
+      "category": "statistic item",
+      "title": "100%",
+      "node": ".column.stat$3>strong.rating",
+      "section": "statistic",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-002_c002_gc006",
+      "category": "statistic item",
+      "title": "tim lokal asal pulau dan kru yang terpercaya",
+      "node": ".column.stat$3>span.description",
+      "section": "statistic",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-003",
+      "category": "container",
+      "title": "About",
+      "node": "section#about-section.section.row.card",
+      "section": "about",
+      "content": "h-003-c001, h-003-c002, h-003-c003",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-003_c001",
+      "category": "eyebrow",
+      "title": "Tentang Kami",
+      "node": ".column.half$1>p.eyebrow",
+      "section": "about",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-003_c002",
+      "category": "title",
+      "title": "Operator lokal resmi yang menggabungkan kenyamanan, ketepatan, dan sentuhan personal.",
+      "node": ".column.half$1>h2.title",
+      "section": "about",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-003_c003",
+      "category": "description",
+      "title": "Kami merancang setiap trip dengan memperhatikan kebutuhan keluarga: jadwal yang tidak terburu-buru, fasilitas yang aman, dan pengalaman yang terasa hangat serta berkesan.",
+      "node": ".column.half$1>p.description",
+      "section": "about",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-003_c004",
+      "category": "image",
+      "imageUrl": "https://placehold.co/720x420/8764b5/ffffff?text=Tim+Lokal",
+      "node": ".column.half$2>img.img-fluid",
+      "section": "about",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-004",
+      "category": "container",
+      "title": "Benefit",
+      "node": "section#benefit-section.section.row",
+      "section": "benefit",
+      "content": "h-003-c001, h-003-c002, h-003-c003, h-003-c004, h-003-c005, h-003-c006, h-003-c007, h-003-c008, h-003-c009, h-003-c010, h-003-c011, h-003-c012",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-004_c001",
+      "category": "title",
+      "title": "Trip privat",
+      "node": ".column.card$1>h3.title",
+      "section": "benefit",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-004_c002",
+      "category": "description",
+      "title": "Trip privat dan tidak digabungkan dengan kelompok lain.",
+      "node": ".column.card$1>p.description",
+      "section": "benefit",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-004_c004",
+      "category": "title",
+      "title": "Harga jelas",
+      "node": ".column.card$1>h3.title",
+      "section": "benefit",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-004_c004",
+      "category": "description",
+      "title": "Estimasi harga yang jelas sebelum pembayaran.",
+      "node": ".column.card$1>p.description",
+      "section": "benefit",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-004_c005",
+      "category": "title",
+      "title": "Support penuh",
+      "node": ".column.card$1>h3.title",
+      "section": "benefit",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-004_c006",
+      "category": "description",
+      "title": "Tim lapangan yang siap membantu dari keberangkatan hingga kembali.",
+      "node": ".column.card$1>p.description",
+      "section": "benefit",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-004_c007",
+      "category": "title",
+      "title": "1. Persiapan & Keberangkatan",
+      "node": ".column.card$2>h3.title",
+      "section": "benefit",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-004_c008",
+      "category": "description",
+      "title": "Koordinasi yang jelas, jadwal kumpul yang rapi, dan transportasi yang sudah dipilih sesuai kebutuhan.",
+      "node": ".column.card$2>p.description",
+      "section": "benefit",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-004_c009",
+      "category": "title",
+      "title": "2. Aktivitas di Pulau",
+      "node": ".column.card$2>h3.title",
+      "section": "benefit",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-004_c010",
+      "category": "description",
+      "title": "Snorkeling, santai di pantai, sunset, dan pilihan add-ons yang dapat disesuaikan dengan usia anggota keluarga.",
+      "node": ".column.card$2>p.description",
+      "section": "benefit",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-004_c011",
+      "category": "title",
+      "title": "3. Kembali dengan Kenangan",
+      "node": ".column.card$2>h3.title",
+      "section": "benefit",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-004_c012",
+      "category": "description",
+      "title": "Semua dokumen, tiket, dan informasi trip akan dikirimkan dengan rapi untuk memudahkan perjalanan pulang.",
+      "node": ".column.card$2>p.description",
+      "section": "benefit",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-005",
+      "category": "container",
+      "title": "Call to Action",
+      "node": "section#cta-section.section.banner",
+      "section": "CTA",
+      "content": "h-005-c001, h-005-c002",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-005_c001",
+      "category": "title",
+      "title": "Siap merancang liburan keluarga yang nyaman?",
+      "node": "h2.title",
+      "section": "CTA",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-005_c002",
+      "category": "actions",
+      "title": "Pesan Sekarang",
+      "node": ".actions",
+      "actions": "CREATE_MODAL:ORDER",
+      "section": "CTA",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-006",
+      "category": "container",
+      "title": "Trust",
+      "node": "section#trust-section.section.row.card.transparent",
+      "section": "trust",
+      "content": "h-006-c001, h-006-c002, h-006-c003",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-006_c001",
+      "category": "eyebrow",
+      "title": "Keamanan & Kepercayaan",
+      "node": "p.eyebrow",
+      "section": "trust",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-006_c002",
+      "category": "title",
+      "title": "Semua titik perjalanan kami dikelola dengan perhatian pada keamanan dan kenyamanan.",
+      "node": "h2.title",
+      "section": "trust",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-006_c003",
+      "category": "description",
+      "title": "Nomor kontak darurat, manifest data penumpang, dan dokumentasi trip kami siapkan dengan detail sehingga Kakak bisa berangkat dengan tenang.",
+      "node": "p.description",
+      "section": "trust",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-007",
+      "category": "container",
+      "title": "Frequently Asked Questions",
+      "node": "section#faq-section.section.row",
+      "section": "FAQ",
+      "content": "h-007_c001",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-007_c001",
+      "category": "title",
+      "title": "Pertanyaan Populer (FAQ)",
+      "node": "h2.title",
+      "section": "FAQ",
+      "timestamp": ""
+    },
+    {
+      "uid": "h-007_c002",
+      "section": "FAQ",
+      "node": ".column.full.compact@accordion",
+      "category": "accordion",
+      "content": "h-007_c002_gc001, h-007_c002_gc002, h-007_c002_gc003"
+    },
+    {
+      "uid": "h-007_c002_gc001",
+      "section": "FAQ",
+      "title": "Apakah ada batas minimal peserta untuk booking?",
+      "description": "Tidak. Kami siap membantu rombongan kecil maupun besar, dan kami akan menyesuaikan paket sesuai kebutuhan Kakak."
+    },
+    {
+      "uid": "h-007_c002_gc002",
+      "section": "FAQ",
+      "title": "Apakah bisa reschedule jika cuaca buruk?",
+      "description": "Ya. Jika operasional dibatalkan karena faktor cuaca atau otoritas pelabuhan, kami akan membantu penjadwalan ulang dengan transparan."
+    },
+    {
+      "uid": "h-007_c002_gc003",
+      "section": "FAQ",
+      "title": "Apakah pembayaran bisa melalui QRIS?",
+      "description": "Ya. Kami mendukung pembayaran QRIS dan akan langsung mengonfirmasi status transaksi setelah pembayaran berhasil."
+    }
+  ]
+}

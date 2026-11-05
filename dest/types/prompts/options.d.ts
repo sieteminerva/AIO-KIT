@@ -1,3 +1,11 @@
+export declare const BUILD_TYPES: {
+    name: string;
+    value: string;
+}[];
+export declare const VITE_PROJECT_TYPES: {
+    name: string;
+    value: string;
+}[];
 export declare const PROJECT_TYPES: {
     name: string;
     value: string;

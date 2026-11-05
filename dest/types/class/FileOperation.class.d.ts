@@ -52,6 +52,7 @@ export declare class AioFileOperation {
      *
      */
     protected isDirectoryExists(dir: string): Promise<void>;
+    cleanDir(dir: string): Promise<void>;
     /**
      * Opens a file at the specified path and returns a file handle.
      *
@@ -141,7 +142,7 @@ export declare class AioFileOperation {
      *
      * ```
      */
-    write(outputFilePath: string, content: string[]): Promise<void>;
+    write(outputFilePath: string, content: string[] | string): Promise<void>;
     /**
      * Removes a file if it exists.
      * @param {string} filePath - The path to the file to be removed.

@@ -2,6 +2,7 @@ import { select } from "@inquirer/prompts";
 import { FileConverterPrompt } from "./FileConverter.prompt.js";
 import { UTIL_TYPES } from "../options.js";
 import { handlePromptError } from "../ErrorHandler.prompt.js";
+import { SelectUtilityPrompt } from "../Utility/SelectUtility.prompt.js";
 /**
  * Presents a selection prompt to the user for choosing a file conversion task.
  *
@@ -21,6 +22,8 @@ import { handlePromptError } from "../ErrorHandler.prompt.js";
  */
 export async function SelectFileConverterPrompt(DIR, filename, options) {
     try {
+        // Clear Console before executing select task 
+        console.clear();
         const task = await select({
             message: 'Choose Converter Task',
             choices: UTIL_TYPES.map((menu) => ({ name: menu.name, value: menu.value })),
@@ -28,6 +31,12 @@ export async function SelectFileConverterPrompt(DIR, filename, options) {
         switch (task) {
             case 'html to json':
                 FileConverterPrompt('.html', '.json');
+                break;
+            case 'html to markdown':
+                FileConverterPrompt('.html', '.md');
+                break;
+            case 'markdown to html':
+                FileConverterPrompt('.md', '.html');
                 break;
             case 'yaml to csv':
                 FileConverterPrompt('.yaml', '.csv');
@@ -50,16 +59,15 @@ export async function SelectFileConverterPrompt(DIR, filename, options) {
             case 'yaml to csv':
                 FileConverterPrompt('.yaml', '.csv');
                 break;
+            case 'back':
+                await SelectUtilityPrompt(DIR, filename, options);
+                break;
             case 'quit':
                 process.exit(0);
         }
-        console.clear();
         return task;
     }
     catch (error) {
         handlePromptError(error);
-    }
-    finally {
-        await SelectFileConverterPrompt(DIR, filename, options = false);
     }
 }

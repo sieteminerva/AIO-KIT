@@ -22,6 +22,7 @@ export declare function createSchema(): {
     todo: typeof createTodo;
     place: typeof createPlace;
     article: typeof createArticle;
+    gallery: typeof createGallery;
     custom: typeof createCustom;
 };
 /**
@@ -164,10 +165,32 @@ export declare function createPlace(): {
  * // { title: 'Voluptatem et ut.', category: 'Renungan Harian', content: 'Quia et et. \n \r Autem et et.', likes: 1234, author: 'Jayson Wintheiser' }
  * ```
  */
-export declare function createArticle(): {
+export declare function createArticle2(): {
     title: string;
     category: "Lagu Rohani" | "Renungan Harian" | "Kotbah" | "Kesaksian" | "Inspirasi" | "Renungan";
     content: string;
+    likes: number;
+    author: string;
+};
+export declare function generateRandomColor(Options?: 'rgb' | 'hex' | 'rgba', alpha?: number, ColorSets?: string[]): string;
+export declare function createArticle(): {
+    title: string;
+    slug: string;
+    summary: string;
+    body: string;
+    thumbnail: string;
+    largeCover: string;
+    date: string;
+    category: "Lagu Rohani" | "Renungan Harian" | "Kotbah" | "Kesaksian" | "Inspirasi" | "Renungan";
+    likes: number;
+    author: string;
+};
+export declare function createGallery(): {
+    title: string;
+    description: string;
+    imageUrl: string;
+    date: string;
+    category: "Pemandangan" | "Pre Wedding" | "Producr" | "Modelling" | "Random" | "Animal";
     likes: number;
     author: string;
 };

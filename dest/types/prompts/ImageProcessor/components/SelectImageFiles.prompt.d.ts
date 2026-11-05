@@ -13,4 +13,5 @@ import { Dirent } from "node:fs";
  * await SelectImageFilesPrompt([{ name: 'image1.jpg', path: '/path/to/image1.jpg' }]);
  * ```
  */
+export declare function SelectImageFilesPrompt2(folder: Dirent[]): Promise<string[] | undefined>;
 export declare function SelectImageFilesPrompt(folder: Dirent[]): Promise<string[] | undefined>;

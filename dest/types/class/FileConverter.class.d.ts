@@ -120,6 +120,13 @@ export declare class AioFileConverter extends AioFileOperation {
      */
     html(filepath: string, usePlaceholder?: boolean): Promise<this>;
     /**
+     *
+     *
+     * @param {string} filepath
+     * @memberof AioFileConverter
+     */
+    md(filepath: string): Promise<this>;
+    /**
      * Converts the current file content to CSV format.
      *
      * This method handles the conversion from JSON or YAML to CSV.
@@ -200,7 +207,18 @@ export declare class AioFileConverter extends AioFileOperation {
      * ```
      */
     toJson(): this;
-    md(): void;
-    toHtml(): void;
-    toMd(): void;
+    /**
+     *
+     *
+     * @return {*}
+     * @memberof AioFileConverter
+     */
+    toHtml(): this;
+    /**
+     *
+     *
+     * @return {*}
+     * @memberof AioFileConverter
+     */
+    toMd(): this;
 }

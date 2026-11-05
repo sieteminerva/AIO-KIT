@@ -5,7 +5,7 @@ import { AioDataGenerator } from "../../class/DataGenerator.class.js";
 import { handlePromptError } from "../ErrorHandler.prompt.js";
 import { DATA_TYPES } from "../options.js";
 import { writeFileTo } from "../../lib/scripts/util.js";
-import { SchemaBuilderPrompt } from "./ScemaBuilder.prompt.js";
+import { SchemaBuilderPrompt } from "./SchemaBuilder.prompt.js";
 import { MainDialogPrompt } from "../main.prompt.js";
 /**
  * `DataGeneratorPrompt` is an asynchronous function that orchestrates the process of generating data based on user input.

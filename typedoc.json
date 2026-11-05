@@ -8,18 +8,17 @@
     "src/modules/FileConverter.ts",
     "src/modules/TextProcessor.ts",
     "src/modules/ImageProcessor.ts",
+    "src/modules/SvgProcessor.ts",
     "src/modules/ProjectScaffolder.ts",
     "src/modules/Utility.ts",
-    "src/modules/Main.ts",
+    "src/modules/Main.ts"
   ],
   "exclude": [
     "src/lib/scripts/InteractiveList.ts",
-    "src/lib/scripts/CustomPrompt.ts",
+    "src/lib/scripts/CustomPrompt.ts"
   ],
   "out": "typedoc",
-  "plugin": [
-    "typedoc-github-theme"
-  ],
+  "plugin": ["typedoc-github-theme"],
   "alwaysCreateEntryPointModule": false,
   "cleanOutputDir": true,
   "navigation": {

@@ -16,6 +16,7 @@ import { MainDialogPrompt } from './prompts/main.prompt.js';
 import { Option, program as aio } from 'commander';
 import { AioTextProcessorMethods } from './class/TextProcessor.class.js';
 import { CompileDeclarationsFilesPrompt } from './prompts/Utility/CompileDeclarationsFiles.prompt.js';
+import { SelectBuildPrompt } from './prompts/Build/prompts.js';
 
 
 // logOutlineBox(null);
@@ -90,6 +91,7 @@ aio
   .action((options) => {
     CreateProjectPrompt(options.name);
   });
+
 
 /**
  * Defines the 'generator' command for the CLI.
@@ -185,6 +187,18 @@ aio
     TextProcessorPrompt(options.engine);
   });
 
+
+
+aio
+  .command('build')
+  .aliases(['b', 'B'])
+  .option('--path [path]', 'destination path location')
+  .addOption(new Option('-e, --engine <method>', 'build processor to use.')
+    .choices(['vite',]))
+  .description(`${greenBright('[Usage] >>')} Project Build System.`)
+  .action((options) => {
+    SelectBuildPrompt(options.path, options);
+  });
 
 /**
  * Defines the 'file' command for the CLI.

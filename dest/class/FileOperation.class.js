@@ -1,5 +1,5 @@
 import { readdir, open, writeFile, rm, readFile, mkdir } from "node:fs/promises";
-import { existsSync } from "node:fs";
+import { existsSync, rmdirSync } from "node:fs";
 import { basename, extname } from "node:path";
 export class AioFileOperation {
     constructor(filePath) {
@@ -74,6 +74,18 @@ export class AioFileOperation {
             throw error;
         }
     }
+    async cleanDir(dir) {
+        try {
+            if (existsSync(dir)) {
+                rmdirSync(dir, { recursive: true });
+            }
+            await mkdir(dir, { recursive: true });
+        }
+        catch (error) {
+            console.error(`Error creating directory ${dir}:`, error);
+            throw error;
+        }
+    }
     /**
      * Opens a file at the specified path and returns a file handle.
      *
@@ -136,6 +148,10 @@ export class AioFileOperation {
                 }
                 return file.name.includes('.'); // Include all files if no extension is specified
             });
+            if (targetedFiles.length === 0) {
+                console.warn(`No ${ext || ""} files found in ${directory}`);
+                return;
+            }
             return targetedFiles;
         }
         catch (error) {

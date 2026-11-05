@@ -17,24 +17,83 @@ import { IMAGE_FORMATS } from "../../options.js";
  * await SelectImageFilesPrompt([{ name: 'image1.jpg', path: '/path/to/image1.jpg' }]);
  * ```
  */
-export async function SelectImageFilesPrompt(folder) {
+export async function SelectImageFilesPrompt2(folder) {
     try {
-        if (folder.length === 0) {
+        if (folder && folder.length === 0 || !folder) {
             console.log(yellowBright('file not found!'));
-            return [];
+            return;
         }
-        const choices = folder.map(file => ({ name: file.name, value: join(file.parentPath, file.name) }));
-        const files = await checkbox({
-            message: 'Select image files to process?\n',
-            choices,
-            validate(choices) {
-                return imageFilesValidation(choices);
-            },
-        });
-        return files;
+        else {
+            const choices = folder.map(file => ({ name: file.name, value: join(file.parentPath, file.name) }));
+            const files = await checkbox({
+                message: 'Select image files to process?\n',
+                choices,
+                validate(choices) {
+                    return imageFilesValidation(choices);
+                },
+            });
+            return files;
+        }
     }
     catch (error) {
         handlePromptError(error);
+    }
+}
+export async function SelectImageFilesPrompt(folder) {
+    let runExecution = true;
+    // Panggil fungsi internal helper dengan status awal belum ada yang diseleksi (kosong)
+    try {
+        if (!folder || folder.length === 0) {
+            console.log(yellowBright('file not found!'));
+            return;
+        }
+        if (runExecution) {
+            // 1. Map file asli dari folder
+            const fileChoices = folder.map(file => {
+                const fullPath = join(file.parentPath, file.name);
+                return {
+                    name: file.name,
+                    value: fullPath,
+                    // Otomatis tercentang jika jalurnya ada di array initialCheckedValues
+                    checked: false
+                };
+            });
+            // 2. Masukkan opsi "Select All" di paling atas
+            // PASTIKAN checked selalu false untuk SELECT ALL agar tidak mengunci loop saat re-render
+            const choices = [
+                { name: '➔ SELECT ALL', value: 'TRIGGER_SELECT_ALL', checked: false },
+                ...fileChoices
+            ];
+            const selectedValues = await checkbox({
+                message: 'Select image files to process?\n',
+                choices,
+                validate(values) {
+                    return imageFilesValidation(values);
+                },
+            });
+            // 3. JIKA USER MEMILIH "SELECT ALL"
+            if (selectedValues.includes('TRIGGER_SELECT_ALL')) {
+                // Ambil seluruh file path asli
+                const allFilePaths = fileChoices.map(c => c.value);
+                // Hitung jumlah file asli yang saat ini sedang tercentang (tidak termasuk TRIGGER_SELECT_ALL)
+                const currentCheckedFilesCount = selectedValues.filter(v => v !== 'TRIGGER_SELECT_ALL').length;
+                // Fitur Tambahan (Toggle): Jika semua file sudah tercentang lalu user menekan Select All lagi, maka lakukan DESELECT ALL (kosongkan)
+                if (currentCheckedFilesCount === allFilePaths.length) {
+                    return allFilePaths;
+                }
+                // Jika belum semua tercentang, jalankan ulang prompt dengan kondisi semua file ter-checked
+                runExecution = false;
+                return allFilePaths;
+            }
+            // Jika user tidak menekan SELECT ALL, langsung kembalikan hasil pilihan file asli
+            return selectedValues;
+        }
+    }
+    catch (error) {
+        handlePromptError(error);
+    }
+    finally {
+        runExecution = false;
     }
 }
 /**
@@ -49,7 +108,10 @@ function imageFilesValidation(files) {
     }
     for (const file of files) {
         const file_ext = extname(file.name).toLowerCase().substring(1);
-        if (!IMAGE_FORMATS.includes(file_ext)) {
+        if (file.value === ("TRIGGER_SELECT_ALL")) {
+            break;
+        }
+        if (!IMAGE_FORMATS.includes(file_ext) || file.value === "TRIGGER_SELECT_ALL") {
             return file_ext + ' is not an image file. Only image files are allowed!';
         }
     }
