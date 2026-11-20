@@ -25,7 +25,7 @@
   "author": "galih.hayuningtyas@outlook.com",
   "license": "ISC",
   "dependencies": {
-    "@faker-js/faker": "^9.6.0",
+    "@faker-js/faker": "^10.6.0",
     "@google-cloud/translate": "^9.0.1",
     "@google-cloud/vertexai": "^1.9.3",
     "@google/generative-ai": "^0.24.0",
@@ -39,7 +39,7 @@
     "mammoth": "^1.9.0",
     "node-fetch": "^3.3.2",
     "pdf-parse": "^1.1.1",
-    "sharp": "^0.33.5",
+    "sharp": "^0.35.5",
     "svgo": "^4.0.0",
     "svgson": "^4.1.0",
     "vite": "^8.0.16",
@@ -59,8 +59,8 @@
     "typescript": "^5.7.2"
   },
   "allowScripts": {
-    "protobufjs@7.6.4": true,
     "sharp@0.33.5": true,
-    "esbuild@0.25.12": true
+    "esbuild@0.25.12": true,
+    "protobufjs@7.6.6": true
   }
 }
