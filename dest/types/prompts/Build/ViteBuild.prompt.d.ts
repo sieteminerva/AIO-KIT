@@ -13,4 +13,4 @@ export declare class ViteRunner {
     webdev(cwd: string): void;
 }
 export declare function ViteBuildPrompt(DIR: string): Promise<void>;
-export declare function ViteBuildGasPrompt(DIR: string, engine: ViteRunner): Promise<void>;
+export declare function ViteGasBuildPrompt(DIR: string, engine: ViteRunner): Promise<void>;
