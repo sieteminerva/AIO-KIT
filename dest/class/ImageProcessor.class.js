@@ -2,6 +2,8 @@ import { dirname, extname, join, resolve } from "path";
 import { AioFileOperation } from "./FileOperation.class.js";
 import sharp from "sharp";
 import { fileURLToPath } from "url";
+/** Formats that a vector source such as SVG can be rasterized into. */
+const RASTER_FORMATS = ['png', 'jpg', 'jpeg', 'webp', 'tiff', 'gif'];
 /**
 * ## AioImageProcessor
 *
@@ -141,6 +143,7 @@ export class AioImageProcessor extends AioFileOperation {
         this._settings = {
             maxWidth: 1200,
             maxHeight: 1200,
+            density: 96, // render density (DPI) for vector sources such as SVG
             metadata: {
                 description: 'This image generated using AIO-KIT | Image Processor',
                 origin: 'Planet Earth before midnight.',
@@ -258,7 +261,7 @@ export class AioImageProcessor extends AioFileOperation {
         // source extension
         this.ext = this._getExtension(this.filepath);
         // console.log(`this.ext: ${this.ext}`);
-        if (!['.png', '.jpg', '.jpeg', '.webp', '.tiff', '.gif'].includes(this.ext)) {
+        if (!['.png', '.jpg', '.jpeg', '.webp', '.tiff', '.gif', '.svg'].includes(this.ext)) {
             throw new Error(`Unsupported image format: ${this.ext}`);
         }
         return this;
@@ -286,22 +289,35 @@ export class AioImageProcessor extends AioFileOperation {
      * ```
      */
     async toImg(pathOrFormat, options = {}) {
-        // console.log('from toImg()');
-        // it its in optimize mode, use the same format as source
-        let format = options.optimize ? pathOrFormat : extname(pathOrFormat).slice(1);
-        options ? options : { quality: 80 };
         // check if source path is provided
         if (!this.filepath) {
             throw new Error("Source image path not set. Use .img() to set the source file.");
         }
-        if (`.${format}` === this.ext && !options.optimize) {
+        if (!pathOrFormat) {
+            throw new Error("Output path or target format is required.");
+        }
+        const isVector = this.ext === '.svg';
+        if (isVector && options.optimize) {
+            console.warn("`optimize` is ignored for SVG sources; an explicit raster target is required.");
+        }
+        // Resolve the output format: an explicit extension wins, otherwise the argument is a format token
+        let format = (isVector || !options.optimize)
+            ? extname(pathOrFormat).slice(1) || pathOrFormat.toLowerCase()
+            : pathOrFormat;
+        if (isVector && !RASTER_FORMATS.includes(format)) {
+            throw new Error(`Cannot convert SVG to "${format}". Supported targets: ${RASTER_FORMATS.join(', ')}.`);
+        }
+        if (`.${format}` === this.ext && !options.optimize && !isVector) {
             console.warn("Output file Extension should be in different format,\nyour first format selections file extension will be used.");
         }
         // console.log('=> format: ', format);
         /** param is `this.filepath` which is source file as the input, we put it in the top line so that it not get accidentaly swapped with the output file **/
-        let converter = this._Sharp(this.filepath);
+        // Vector sources are rasterized at the given density (DPI), default 96
+        let converter = isVector
+            ? this._Sharp(this.filepath, { density: options.density ?? this.settings.density ?? 96 })
+            : this._Sharp(this.filepath);
         /** building output path with custom or default naming **/
-        this.outputPath = this._buildOutputPath(pathOrFormat, options.suffix);
+        this.outputPath = await this._buildOutputPath(pathOrFormat, options.suffix);
         if (format === 'jpg') {
             format = 'jpeg';
         }
@@ -309,13 +325,16 @@ export class AioImageProcessor extends AioFileOperation {
         converter = converter.toFormat(format, options);
         const metaSize = await converter.metadata();
         //console.log('metaSize: ', metaSize);
-        let resizeOptions;
         // Resize the image
         if (options.resize) {
             // calculate resize
             const maxWidth = options.maxWidth ? options.maxWidth : this.settings.maxWidth;
-            // const size = this._resize(metaSize.width as number, metaSize.height as number);
-            const size = this._resizeByMaxWidth(maxWidth, metaSize);
+            // SVG sources may only expose a viewBox, so width/height can be missing
+            const hasSize = Boolean(metaSize.width && metaSize.height);
+            const size = hasSize
+                ? this._resizeByMaxWidth(maxWidth, { width: metaSize.width, height: metaSize.height })
+                : { width: maxWidth, height: maxWidth };
+            let resizeOptions;
             if (options.squared) {
                 /**
                  * @remark Squared Options
@@ -336,7 +355,13 @@ export class AioImageProcessor extends AioFileOperation {
                 resizeOptions = { fit: 'inside', withoutEnlargement: true };
             }
             // create image after resize
-            converter = converter.resize(size.width, size.height, resizeOptions);
+            converter = hasSize
+                ? converter.resize(size.width, size.height, resizeOptions)
+                : converter.resize({ width: size.width, ...resizeOptions });
+        }
+        // Formats without an alpha channel need the transparency flattened onto a background
+        if (format === 'jpeg') {
+            converter = converter.flatten({ background: options.background ?? '#ffffff' });
         }
         // text metadata
         if (this.metadata) {
@@ -361,7 +386,7 @@ export class AioImageProcessor extends AioFileOperation {
      * Builds the output path for the converted image.
      * @param {string} pathOrFormat - The output path or format.
      * If only format is provided, the output will be in the same directory as the source.
-     * @param {string} suffix - The suffix to add to the output filename.
+     * @param {string} [suffix] - The suffix to add to the output filename. Omitted when empty.
      * @returns {string} - The full output path.
      * @example
      * ```typescript
@@ -370,7 +395,7 @@ export class AioImageProcessor extends AioFileOperation {
      *
      * ```
      */
-    _buildOutputPath(pathOrFormat, suffix) {
+    async _buildOutputPath(pathOrFormat, suffix) {
         let basepath;
         let ext;
         let outputFilename;
@@ -379,7 +404,7 @@ export class AioImageProcessor extends AioFileOperation {
         if (extname(pathOrFormat) === '') {
             ext = '.' + pathOrFormat;
             basepath = resolve(dirname(this.filepath));
-            outputFilename = `${this._getFilename(this.filepath)}_${suffix}${ext}`;
+            outputFilename = `${this._getFilename(this.filepath)}${suffix ? `_${suffix}` : ''}${ext}`;
         }
         else {
             ext = this._getExtension(pathOrFormat);
@@ -387,7 +412,7 @@ export class AioImageProcessor extends AioFileOperation {
             outputFilename = this._getFilename(pathOrFormat) + ext;
         }
         // create directory based on basepath if it not exists
-        this.isDirectoryExists(basepath);
+        await this.isDirectoryExists(basepath);
         const outputPath = join(basepath, outputFilename);
         return outputPath;
     }

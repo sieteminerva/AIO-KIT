@@ -1,7 +1,18 @@
 
 import { dirname, extname, join, resolve } from "path";
 import { AioFileOperation } from "./FileOperation.class.js";
-import sharp from "sharp";
+import sharp, {
+  type FormatEnum,
+  type GifOptions,
+  type JpegOptions,
+  type JxlOptions,
+  type OverlayOptions,
+  type PngOptions,
+  type ResizeOptions,
+  type Sharp,
+  type TiffOptions,
+  type WebpOptions,
+} from "sharp";
 import { fileURLToPath } from "url";
 
 /**
@@ -25,7 +36,7 @@ export interface ImageMetadata {
 /**
  * @interface ImageOptions
  * Represents the options for image processing, including format-specific options, resizing, watermark, and more.
- * @extends sharp.JpegOptions, sharp.PngOptions, sharp.WebpOptions, sharp.TiffOptions, sharp.GifOptions, sharp.JxlOptions
+ * @extends JpegOptions, PngOptions, WebpOptions, TiffOptions, GifOptions, JxlOptions
  * @property {boolean} [resize] - Whether to resize the image.
  * @property {boolean} [watermark] - Whether to apply a watermark to the image.
  * @property {string} [watermarkPosition] - The position of the watermark on the image (e.g., 'center', 'top', 'bottom').
@@ -35,10 +46,12 @@ export interface ImageMetadata {
  * @property {boolean} [optimize] - Whether to optimize the image (e.g., reduce file size).
  * @property {number} [quality] - The quality of the output image (0-100).
  * @property {string} [compressionLevel] - The compression level of the output image (0-9).
+ * @property {number} [density] - Render density (DPI) for vector sources such as SVG. Defaults to 96.
+ * @property {string} [background] - Background color used to flatten transparency for formats without an alpha channel (e.g. JPEG). Defaults to `#ffffff`.
  */
-export interface ImageOptions extends sharp.JpegOptions, sharp.PngOptions, sharp.WebpOptions,
-  sharp.TiffOptions, sharp.GifOptions,
-  sharp.JxlOptions {
+export interface ImageOptions extends JpegOptions, PngOptions, WebpOptions,
+  TiffOptions, GifOptions,
+  JxlOptions {
   resize?: boolean;
   watermark?: boolean;
   watermarkPosition?: string;
@@ -46,6 +59,8 @@ export interface ImageOptions extends sharp.JpegOptions, sharp.PngOptions, sharp
   suffix?: string;
   maxWidth?: number;
   optimize?: boolean;
+  density?: number;
+  background?: string;
 }
 
 /**
@@ -54,6 +69,9 @@ export interface ImageOptions extends sharp.JpegOptions, sharp.PngOptions, sharp
  * @property {'jpg' | 'jpeg' | 'png' | 'webp' | 'tiff' | 'gif'}
  */
 export type ImageFormat = 'jpg' | 'jpeg' | 'png' | 'webp' | 'tiff' | 'gif';
+
+/** Formats that a vector source such as SVG can be rasterized into. */
+const RASTER_FORMATS = ['png', 'jpg', 'jpeg', 'webp', 'tiff', 'gif'] as const;
 
 
 /**
@@ -202,6 +220,7 @@ export class AioImageProcessor extends AioFileOperation {
     this._settings = {
       maxWidth: 1200,
       maxHeight: 1200,
+      density: 96, // render density (DPI) for vector sources such as SVG
       metadata: {
         description: 'This image generated using AIO-KIT | Image Processor',
         origin: 'Planet Earth before midnight.',
@@ -329,7 +348,7 @@ export class AioImageProcessor extends AioFileOperation {
     this.ext = this._getExtension(this.filepath);
     // console.log(`this.ext: ${this.ext}`);
 
-    if (!['.png', '.jpg', '.jpeg', '.webp', '.tiff', '.gif'].includes(this.ext)) {
+    if (!['.png', '.jpg', '.jpeg', '.webp', '.tiff', '.gif', '.svg'].includes(this.ext)) {
       throw new Error(`Unsupported image format: ${this.ext}`);
     }
 
@@ -359,42 +378,61 @@ export class AioImageProcessor extends AioFileOperation {
    * ```
    */
   async toImg(pathOrFormat: string | undefined, options: ImageOptions = {}): Promise<AioImageProcessor | undefined> {
-    // console.log('from toImg()');
-    // it its in optimize mode, use the same format as source
-    let format = options.optimize ? pathOrFormat : extname(pathOrFormat as string).slice(1);
-
-    options ? options : { quality: 80 }
     // check if source path is provided
     if (!this.filepath) {
       throw new Error("Source image path not set. Use .img() to set the source file.");
     }
+    if (!pathOrFormat) {
+      throw new Error("Output path or target format is required.");
+    }
 
-    if (`.${format}` === this.ext && !options.optimize) {
+    const isVector = this.ext === '.svg';
+
+    if (isVector && options.optimize) {
+      console.warn("`optimize` is ignored for SVG sources; an explicit raster target is required.");
+    }
+
+    // Resolve the output format: an explicit extension wins, otherwise the argument is a format token
+    let format = (isVector || !options.optimize)
+      ? extname(pathOrFormat).slice(1) || pathOrFormat.toLowerCase()
+      : pathOrFormat;
+
+    if (isVector && !(RASTER_FORMATS as readonly string[]).includes(format)) {
+      throw new Error(`Cannot convert SVG to "${format}". Supported targets: ${RASTER_FORMATS.join(', ')}.`);
+    }
+
+    if (`.${format}` === this.ext && !options.optimize && !isVector) {
       console.warn("Output file Extension should be in different format,\nyour first format selections file extension will be used.");
     }
     // console.log('=> format: ', format);
 
     /** param is `this.filepath` which is source file as the input, we put it in the top line so that it not get accidentaly swapped with the output file **/
-    let converter = this._Sharp(this.filepath);
+    // Vector sources are rasterized at the given density (DPI), default 96
+    let converter = isVector
+      ? this._Sharp(this.filepath, { density: options.density ?? this.settings.density ?? 96 })
+      : this._Sharp(this.filepath);
 
     /** building output path with custom or default naming **/
-    this.outputPath = this._buildOutputPath(pathOrFormat as string, options.suffix as string);
+    this.outputPath = await this._buildOutputPath(pathOrFormat, options.suffix);
 
 
     if (format === 'jpg') { format = 'jpeg'; }
     // Set Optimization Options
 
-    converter = converter.toFormat(format as keyof sharp.FormatEnum, options as ImageOptions);
+    converter = converter.toFormat(format as keyof FormatEnum, options as ImageOptions);
 
     const metaSize = await converter.metadata();
     //console.log('metaSize: ', metaSize);
-    let resizeOptions: sharp.ResizeOptions;
     // Resize the image
     if (options.resize) {
       // calculate resize
       const maxWidth = options.maxWidth ? options.maxWidth : this.settings.maxWidth;
-      // const size = this._resize(metaSize.width as number, metaSize.height as number);
-      const size = this._resizeByMaxWidth(maxWidth, metaSize as any);
+      // SVG sources may only expose a viewBox, so width/height can be missing
+      const hasSize = Boolean(metaSize.width && metaSize.height);
+      const size = hasSize
+        ? this._resizeByMaxWidth(maxWidth, { width: metaSize.width as number, height: metaSize.height as number })
+        : { width: maxWidth, height: maxWidth };
+      let resizeOptions: ResizeOptions;
       if (options.squared) {
         /** 
          * @remark Squared Options
@@ -415,7 +453,14 @@ export class AioImageProcessor extends AioFileOperation {
         resizeOptions = { fit: 'inside', withoutEnlargement: true }
       }
       // create image after resize
-      converter = converter.resize(size.width, size.height, resizeOptions);
+      converter = hasSize
+        ? converter.resize(size.width, size.height, resizeOptions)
+        : converter.resize({ width: size.width, ...resizeOptions });
+    }
+
+    // Formats without an alpha channel need the transparency flattened onto a background
+    if (format === 'jpeg') {
+      converter = converter.flatten({ background: options.background ?? '#ffffff' });
     }
 
     // text metadata
@@ -445,7 +490,7 @@ export class AioImageProcessor extends AioFileOperation {
    * Builds the output path for the converted image.
    * @param {string} pathOrFormat - The output path or format.
    * If only format is provided, the output will be in the same directory as the source.
-   * @param {string} suffix - The suffix to add to the output filename.
+   * @param {string} [suffix] - The suffix to add to the output filename. Omitted when empty.
    * @returns {string} - The full output path.
    * @example 
    * ```typescript
@@ -454,7 +499,7 @@ export class AioImageProcessor extends AioFileOperation {
    * 
    * ```
    */
-  private _buildOutputPath(pathOrFormat: string, suffix: string) {
+  private async _buildOutputPath(pathOrFormat: string, suffix?: string) {
     let basepath: string;
     let ext: string;
     let outputFilename: string;
@@ -463,14 +508,14 @@ export class AioImageProcessor extends AioFileOperation {
     if (extname(pathOrFormat as string) === '') {
       ext = '.' + pathOrFormat;
       basepath = resolve(dirname(this.filepath as string));
-      outputFilename = `${this._getFilename(this.filepath as string)}_${suffix}${ext}`;
+      outputFilename = `${this._getFilename(this.filepath as string)}${suffix ? `_${suffix}` : ''}${ext}`;
     } else {
       ext = this._getExtension(pathOrFormat as string);
       basepath = resolve(dirname(pathOrFormat as string));
       outputFilename = this._getFilename(pathOrFormat) + ext;
     }
     // create directory based on basepath if it not exists
-    this.isDirectoryExists(basepath);
+    await this.isDirectoryExists(basepath);
 
     const outputPath = join(basepath, outputFilename);
 
@@ -565,7 +610,7 @@ export class AioImageProcessor extends AioFileOperation {
    * 
    * ```
    */
-  private async _setMetadata(converter: sharp.Sharp) {
+  private async _setMetadata(converter: Sharp) {
     const watermarkSettings = {
       path: this.settings.watermark.path,
       opacity: this.settings.watermark.opacity, // Default opacity
@@ -584,7 +629,7 @@ export class AioImageProcessor extends AioFileOperation {
       .toBuffer();
 
     const compositeOptions = [{ input: watermarkImg, blend: 'over', gravity: watermarkSettings.position }] as any;
-    converter = converter.composite(compositeOptions as sharp.OverlayOptions[]);
+    converter = converter.composite(compositeOptions as OverlayOptions[]);
   }
 
 }

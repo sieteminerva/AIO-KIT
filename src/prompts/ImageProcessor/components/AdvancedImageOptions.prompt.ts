@@ -1,5 +1,5 @@
 import { number, Separator, expand } from "@inquirer/prompts";
-import sharp from "sharp";
+import type { Sharp } from "sharp";
 import { cyanBright, gray, greenBright, italic, yellowBright } from "yoctocolors";
 import { ImageOptions } from "../../../class/ImageProcessor.class.js";
 import { SetWatermarkOptionsPrompt } from "./SetWatermark.prompt.js";
@@ -10,7 +10,7 @@ import { SetGifOptionsPrompt } from "./SetGifOptions.prompt.js";
 import { SetWebpOptionsPrompt } from "./SetWebpOptions.prompt.js";
 
 // Mapping of image formats to their corresponding sharp options interfaces
-const imageFormatOptionsMap: { [key: string]: keyof sharp.Sharp } = {
+const imageFormatOptionsMap: { [key: string]: keyof Sharp } = {
   'jpg': 'jpeg',
   'jpeg': 'jpeg',
   'png': 'png',

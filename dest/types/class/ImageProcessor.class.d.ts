@@ -1,5 +1,5 @@
 import { AioFileOperation } from "./FileOperation.class.js";
-import sharp from "sharp";
+import { type GifOptions, type JpegOptions, type JxlOptions, type PngOptions, type TiffOptions, type WebpOptions } from "sharp";
 /**
  * @interface ImageMetadata
  * Represents the metadata for an image, including description, origin, author, copyright, and keywords.
@@ -19,7 +19,7 @@ export interface ImageMetadata {
 /**
  * @interface ImageOptions
  * Represents the options for image processing, including format-specific options, resizing, watermark, and more.
- * @extends sharp.JpegOptions, sharp.PngOptions, sharp.WebpOptions, sharp.TiffOptions, sharp.GifOptions, sharp.JxlOptions
+ * @extends JpegOptions, PngOptions, WebpOptions, TiffOptions, GifOptions, JxlOptions
  * @property {boolean} [resize] - Whether to resize the image.
  * @property {boolean} [watermark] - Whether to apply a watermark to the image.
  * @property {string} [watermarkPosition] - The position of the watermark on the image (e.g., 'center', 'top', 'bottom').
@@ -29,8 +29,10 @@ export interface ImageMetadata {
  * @property {boolean} [optimize] - Whether to optimize the image (e.g., reduce file size).
  * @property {number} [quality] - The quality of the output image (0-100).
  * @property {string} [compressionLevel] - The compression level of the output image (0-9).
+ * @property {number} [density] - Render density (DPI) for vector sources such as SVG. Defaults to 96.
+ * @property {string} [background] - Background color used to flatten transparency for formats without an alpha channel (e.g. JPEG). Defaults to `#ffffff`.
  */
-export interface ImageOptions extends sharp.JpegOptions, sharp.PngOptions, sharp.WebpOptions, sharp.TiffOptions, sharp.GifOptions, sharp.JxlOptions {
+export interface ImageOptions extends JpegOptions, PngOptions, WebpOptions, TiffOptions, GifOptions, JxlOptions {
     resize?: boolean;
     watermark?: boolean;
     watermarkPosition?: string;
@@ -38,6 +40,8 @@ export interface ImageOptions extends sharp.JpegOptions, sharp.PngOptions, sharp
     suffix?: string;
     maxWidth?: number;
     optimize?: boolean;
+    density?: number;
+    background?: string;
 }
 /**
  * @type ImageFormat
@@ -275,7 +279,7 @@ export declare class AioImageProcessor extends AioFileOperation {
      * Builds the output path for the converted image.
      * @param {string} pathOrFormat - The output path or format.
      * If only format is provided, the output will be in the same directory as the source.
-     * @param {string} suffix - The suffix to add to the output filename.
+     * @param {string} [suffix] - The suffix to add to the output filename. Omitted when empty.
      * @returns {string} - The full output path.
      * @example
      * ```typescript

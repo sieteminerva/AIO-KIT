@@ -1,5 +1,4 @@
 import { parse } from "path";
-import { flatten } from "lodash-es";
 import { writeFile } from "fs";
 import { toReadFileSync } from "./util.js";
 const DEST_DIR = process.cwd();
@@ -18,7 +17,7 @@ export async function concatFilesInFolder(filespath) {
     }
     // write to file
     // console.log('CONTENTS', contents);
-    const mergeFilesContent = JSON.stringify(flatten(contents), null, 2);
+    const mergeFilesContent = JSON.stringify(contents.flat(1), null, 2);
     const mergeFileName = `${dir}${ext}`;
     writeFile(`${DEST_DIR}/${mergeFileName}`, mergeFilesContent, "utf8", (error) => {
         if (error) {

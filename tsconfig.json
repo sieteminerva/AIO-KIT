@@ -11,14 +11,15 @@
     "outDir": "./dest",
     "declaration": true,
     "declarationDir": "./dest/types",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "types": ["node"]
   },
-  "include": ["src/**/*.ts", "archieves/Auth.class.keyfile.ts"],
+  "include": ["src/**/*.ts", ".archieves/Auth.class.keyfile.ts"],
   "exclude": [
     "node_modules",
-    "archieves",
+    ".archieves",
     "docs",
-    "compileAssets.ts"
+    "compileAssets.mjs"
     // "src/modules/*.ts"
   ]
 }

@@ -59,6 +59,10 @@ export class AioProjectScaffolder {
   }
 
   /**
+   * // TODO
+   * - new vite x @aio-ui (custom build)
+   * - new vite x @aio-gas consumer
+   * 
    * Creates a directory structure for a web project.
    *
    * This method creates a main directory specified by `DIR` and then creates
@@ -102,5 +106,11 @@ export class AioProjectScaffolder {
         });
       }
     });
+  }
+  /**
+   * 
+   */
+  CliCommand() {
+
   }
 }

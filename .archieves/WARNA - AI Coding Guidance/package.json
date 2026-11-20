@@ -1,0 +1,23 @@
+{
+  "name": "agentic-spec-harness",
+  "version": "1.0.0",
+  "description": "Zero-dependency Spec-Driven Development & Multi-Agent Orchestration harness generator for monorepos and engineering teams.",
+  "type": "module",
+  "bin": {
+    "create-harness": "./bin/create-harness.mjs"
+  },
+  "keywords": [
+    "ai-agents",
+    "spec-driven-development",
+    "monorepo",
+    "cli",
+    "developer-experience",
+    "llm-orchestration",
+    "context-engineering"
+  ],
+  "author": "<Nama Anda>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,6 +1,78 @@
 import { FileHandle, readdir, open, writeFile, rm, readFile, mkdir } from "node:fs/promises";
-import { Dirent, existsSync, rmdirSync, rmSync } from "node:fs";
-import { basename, extname } from "node:path";
+import {
+  Dirent,
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  renameSync,
+  rmSync,
+  rmdirSync,
+  unlinkSync,
+  writeFileSync,
+} from "node:fs";
+import { basename, dirname, extname, join, relative, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+interface ListRecursiveOptions {
+  includes?: string[];
+  excludes?: string[];
+  _result?: string[]; // Internal recursion buffer to save RAM
+}
+
+/**
+ * Immutable, chainable path builder.
+ * @example
+ * ```typescript
+ *
+ *    AioFileOperation.path('src', 'class').join('FileOperation.class.ts').resolve()
+ *
+ * ```
+ */
+export class FileSystemPath {
+  private value: string[];
+  private _cachedNormalized: string = '';
+
+  constructor(...value: string[]) {
+    this.value = value.map(p => String(p));
+  }
+
+  // Cached O(1) access so regex replacement stays fast inside loops
+  get normalized(): string {
+    if (!this._cachedNormalized) {
+      this._cachedNormalized = join(...this.value).replace(/\\/g, "/");
+    }
+    return this._cachedNormalized;
+  }
+
+  // Chaining step: returns a new object so calls can be piped further
+  join(...args: string[]): FileSystemPath {
+    return new FileSystemPath(this.normalized, ...args);
+  }
+
+  // Terminal step: returns the raw string Node.js expects
+  resolve(): string {
+    return resolve(this.normalized).replace(/\\/g, "/");
+  }
+
+  relativeTo(root: string): string {
+    return relative(root, this.normalized).replace(/\\/g, "/");
+  }
+
+  escape(): string {
+    return this.normalized.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+  }
+
+  // Safety net when the instance is used inside template literals
+  toString(): string {
+    return this.normalized;
+  }
+
+  valueOf(): string {
+    return this.normalized;
+  }
+}
 
 export class AioFileOperation {
 
@@ -268,6 +340,312 @@ export class AioFileOperation {
     if (existsSync(filePath)) {
       console.log(`[Remove existing]: '${filePath}'`);
       await rm(filePath); // remove existing index.d.ts file
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Static path helpers
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Builds an absolute path from a module `import.meta.url` plus sub-paths.
+   * @example
+   * ```typescript
+   *
+   *    AioFileOperation.fromMeta(import.meta.url, 'templates') // '/abs/dir/templates'
+   *
+   * ```
+   */
+  static fromMeta(metaUrl: string, ...paths: string[]): string {
+    // 1. Convert a file:/// module URL into a plain OS path
+    const currentDir = dirname(fileURLToPath(metaUrl));
+
+    // 2. Join it with the requested sub-paths and normalize separators
+    return join(currentDir, ...paths).replace(/\\/g, "/");
+  }
+
+  /** Joins path segments and normalizes separators to forward slashes. */
+  static normalize(...path: string[]): string {
+    return join(...path).replace(/\\/g, "/");
+  }
+
+  /** Resolves `to` relative to `from` and normalizes separators. */
+  static relative(from: string, to: string): string {
+    return this.normalize(relative(from, to));
+  }
+
+  /** Resolves path segments to an absolute path with forward slashes. */
+  static resolve(...paths: string[]): string {
+    return resolve(join(...paths)).replace(/\\/g, "/");
+  }
+
+  /** Escapes a string for safe use inside a RegExp. */
+  static regexEscape(str: string): string {
+    return str.replace(/[-\\/\\^$*+?.()|[\\]{}]/g, "\\$&");
+  }
+
+  /** Normalized alias of `path.join`. */
+  static join(...args: string[]): string {
+    return this.normalize(join(...args));
+  }
+
+  /** Starts a chainable {@link FileSystemPath}. */
+  static path(...str: string[]): FileSystemPath {
+    return new FileSystemPath(...str);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Static JSON helpers
+  // ---------------------------------------------------------------------------
+
+  static readJson<T>(path: string | FileSystemPath): T {
+    try {
+      return JSON.parse(this.read(path));
+    } catch (error) {
+      console.error(`[AioFileOperation] Failed to read or parse JSON file: ${path}`);
+      throw error;
+    }
+  }
+
+  static writeJson(path: string | FileSystemPath, value: unknown): void {
+    try {
+      this.write(path, JSON.stringify(value, null, 2));
+    } catch (error) {
+      console.error(`[AioFileOperation] Failed to write JSON file: ${path}`);
+      throw error;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Static sync file helpers
+  // ---------------------------------------------------------------------------
+
+  static exists(path: string | FileSystemPath): boolean {
+    try {
+      // String(path) extracts .normalized from a FileSystemPath instance
+      return existsSync(resolve(String(path)));
+    } catch (error) {
+      console.error(`[AioFileOperation] Failed to check existence of path: ${path}`);
+      throw error;
+    }
+  }
+
+  static ensureDirectory(path: string | FileSystemPath): void {
+    const pathStr = String(path);
+    try {
+      if (!existsSync(pathStr)) {
+        mkdirSync(pathStr, { recursive: true });
+      }
+    } catch (error) {
+      console.error(`[AioFileOperation] Failed to create directory: ${pathStr}`);
+      throw error;
+    }
+  }
+
+  static remove(path: string | FileSystemPath): void {
+    const pathStr = String(path);
+    try {
+      if (existsSync(pathStr)) {
+        unlinkSync(pathStr);
+      }
+    } catch (error) {
+      console.error(`[AioFileOperation] Failed to remove file: ${pathStr}`);
+      throw error;
+    }
+  }
+
+  static removeRecursive(path: string | FileSystemPath): void {
+    const pathStr = String(path);
+    try {
+      if (existsSync(pathStr)) {
+        rmSync(pathStr, { recursive: true, force: true });
+      }
+    } catch (error) {
+      console.error(`[AioFileOperation] Failed to recursively remove path: ${pathStr}`);
+      throw error;
+    }
+  }
+
+  static read(path: string | FileSystemPath): string {
+    const pathStr = String(path);
+    try {
+      return readFileSync(pathStr, "utf-8");
+    } catch (error) {
+      console.error(`[AioFileOperation] Failed to read file: ${pathStr}`);
+      throw error;
+    }
+  }
+
+  static write(path: string | FileSystemPath, content: string): void {
+    const pathStr = String(path);
+    try {
+      writeFileSync(pathStr, content);
+    } catch (error) {
+      console.error(`[AioFileOperation] Failed to write file: ${pathStr}`);
+      throw error;
+    }
+  }
+
+  static copy(src: string | FileSystemPath, dest: string | FileSystemPath): void {
+    const srcStr = String(src);
+    const destStr = String(dest);
+    try {
+      this.ensureDirectory(dirname(destStr));
+      copyFileSync(srcStr, destStr);
+    } catch (error) {
+      console.error(`[AioFileOperation] Failed to copy file from ${srcStr} to ${destStr}`);
+      throw error;
+    }
+  }
+
+  static move(src: string | FileSystemPath, dest: string | FileSystemPath): void {
+    const srcStr = String(src);
+    const destStr = String(dest);
+    try {
+      this.ensureDirectory(dirname(destStr));
+
+      try {
+        renameSync(srcStr, destStr);
+      } catch {
+        // Fallback for cross-device moves
+        this.copy(src, dest);
+        this.remove(src);
+      }
+    } catch (error) {
+      console.error(`[AioFileOperation] Failed to move file from ${srcStr} to ${destStr}`);
+      throw error;
+    }
+  }
+
+  static list(dir: string | FileSystemPath): string[] {
+    const dirStr = String(dir);
+    try {
+      return readdirSync(dirStr);
+    } catch (error) {
+      console.error(`[AioFileOperation] Failed to list directory contents: ${dirStr}`);
+      throw error;
+    }
+  }
+
+  /** Recursively lists files, reusing one output array to save RAM. */
+  static listRecursive(
+    dir: string | FileSystemPath,
+    filter?: (path: string) => boolean,
+    result: string[] = []
+  ): string[] {
+    const dirStr = String(dir);
+
+    try {
+      const entries = readdirSync(dirStr, { withFileTypes: true });
+
+      for (const entry of entries) {
+        const entryPath = join(dirStr, entry.name);
+
+        if (entry.isDirectory()) {
+          this.listRecursive(entryPath, filter, result);
+        } else if (!filter || filter(entryPath)) {
+          result.push(entryPath);
+        }
+      }
+    } catch (error) {
+      console.error(`[AioFileOperation] Failed to read directory recursively: ${dirStr}`, error);
+      throw error;
+    }
+
+    return result;
+  }
+
+  /** Recursively lists files with `includes` / `excludes` pattern matching. */
+  static listRecursiveX(
+    dir: string,
+    filter?: (path: string) => boolean,
+    options: ListRecursiveOptions = {}
+  ): string[] {
+    const dirStr = String(dir);
+    const result = options._result ?? [];
+
+    try {
+      const entries = readdirSync(dirStr, { withFileTypes: true });
+
+      for (const entry of entries) {
+        // 1. Keep the native Node.js path for filesystem access
+        const rawPath = join(dirStr, entry.name);
+
+        // 2. Normalize separators so include/exclude matching works on any OS
+        const entryPath = this.normalize(rawPath);
+
+        if (entry.isDirectory()) {
+          this.listRecursiveX(rawPath, filter, {
+            ...options,
+            _result: result
+          });
+        } else {
+          // 1. Custom filter
+          if (filter && !filter(entryPath)) continue;
+
+          // 2. Excludes check
+          const isExcluded = options.excludes?.some(pattern => {
+            const cleanPattern = pattern.replace(/\\/g, '/');
+            return entryPath.includes(cleanPattern);
+          });
+          if (isExcluded) continue;
+
+          // 3. Includes check
+          const hasIncludes = options.includes && options.includes.length > 0;
+          const isIncluded = !hasIncludes || options.includes!.some(pattern => {
+            const cleanPattern = pattern.replace(/\\/g, '/');
+            return entryPath.includes(cleanPattern);
+          });
+
+          if (isIncluded) {
+            result.push(entryPath);
+          }
+        }
+      }
+    } catch (error) {
+      console.error(`[AioFileOperation] Failed to read directory (listRecursiveX): ${dirStr}`, error);
+      throw error;
+    }
+
+    return result;
+  }
+
+  /** Streams files recursively without buffering the whole tree in memory. */
+  static async *listRecursiveAsync(
+    dir: string,
+    filter?: (path: string) => boolean
+  ): AsyncGenerator<string> {
+    try {
+      const entries = await readdir(dir, { withFileTypes: true });
+
+      for (const entry of entries) {
+        const entryPath = join(dir, entry.name);
+
+        if (entry.isDirectory()) {
+          // yield* forwards sub-generator values without allocating an array
+          yield* this.listRecursiveAsync(entryPath, filter);
+        } else if (!filter || filter(entryPath)) {
+          yield entryPath;
+        }
+      }
+    } catch (error) {
+      console.error(`[AioFileOperation] Failed to read directory (async): ${dir}`, error);
+      throw error;
+    }
+  }
+
+  /** Removes a path (file or directory) recursively. */
+  static clean(...path: string[]): void {
+    const str = join(...path).replace(/\\/g, "/");
+    try {
+      if (!existsSync(str)) {
+        return;
+      }
+      console.log("[Cleaning..] ->", str);
+      rmSync(str, { recursive: true, force: true });
+    } catch (error) {
+      console.error(`[AioFileOperation] Failed to clean path: ${str}`, error);
+      throw error;
     }
   }
 

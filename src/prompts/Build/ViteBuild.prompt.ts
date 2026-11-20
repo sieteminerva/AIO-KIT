@@ -93,7 +93,7 @@ export async function ViteBuildPrompt(DIR: string,) {
 
     switch (projectType) {
       case 'gas':
-        ViteBuildGasPrompt(DIR, engine)
+        ViteGasBuildPrompt(DIR, engine)
         break;
       case 'website':
         engine.webdev(cwd)
@@ -114,7 +114,7 @@ export async function ViteBuildPrompt(DIR: string,) {
 }
 
 
-export async function ViteBuildGasPrompt(DIR: string, engine: ViteRunner) {
+export async function ViteGasBuildPrompt(DIR: string, engine: ViteRunner) {
   const cwd = DIR ? DIR : process.cwd();
 
   try {

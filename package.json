@@ -14,8 +14,8 @@
   "types": "dest/types/index.d.ts",
   "test": "dest/test/**/*.js",
   "scripts": {
-    "dev": "npx tsx src/index.ts",
-    "build": "tsc && npx tsx ./compileAssets.ts && npm link",
+    "dev": "tsx src/index.ts",
+    "build": "tsc && node ./compileAssets.mjs && npm link",
     "start": "node dest/index.js",
     "docs": "npx typedoc"
   },
@@ -35,7 +35,6 @@
     "google-auth-library": "^9.15.1",
     "googleapis": "^173.0.0",
     "json-2-csv": "^5.5.9",
-    "lodash-es": "^4.17.21",
     "mammoth": "^1.9.0",
     "node-fetch": "^3.3.2",
     "pdf-parse": "^1.1.1",
@@ -49,18 +48,17 @@
   "devDependencies": {
     "@types/commander": "^2.12.2",
     "@types/json2csv": "^4.2.0",
-    "@types/lodash-es": "^4.17.12",
-    "@types/node": "^22.13.10",
+    "@types/node": "^22.20.5",
     "@types/svgo": "^2.6.4",
     "@types/yamljs": "^0.2.30",
-    "tsx": "^4.19.3",
+    "tsx": "^4.23.15",
     "typedoc": "^0.27.6",
     "typedoc-github-theme": "^0.2.1",
     "typescript": "^5.7.2"
   },
   "allowScripts": {
     "sharp@0.33.5": true,
-    "esbuild@0.25.12": true,
-    "protobufjs@7.6.6": true
+    "protobufjs@7.6.6": true,
+    "esbuild@0.28.2": true
   }
 }

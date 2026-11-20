@@ -1,9 +1,58 @@
 
-import { template as _template } from "lodash-es";
 import { readdir, writeFile, readFile, readdirSync, statSync, readFileSync, lstatSync } from "fs";
 import { parse, resolve, basename } from "path";
 import { lookup } from "node:dns/promises";
 import { yellowBright } from "yoctocolors";
+
+function isPlainObject(value: unknown): value is Record<string, any> {
+  if (Object.prototype.toString.call(value) !== '[object Object]') return false;
+  const proto = Object.getPrototypeOf(value);
+  return proto === null || proto === Object.prototype;
+}
+
+/**
+ * Deep-merges plain objects and arrays in place, later sources win.
+ * Native replacement for `lodash.merge`.
+ * @example
+ * ```typescript
+ *
+ *    merge({ a: { x: 1 } }, { a: { y: 2 } }) // { a: { x: 1, y: 2 } }
+ *
+ * ```
+ */
+export function merge<T = any>(target: any, ...sources: any[]): T {
+  for (const source of sources) {
+    if (!source) continue;
+    const entries = Array.isArray(source)
+      ? source.map((value, index) => [index, value] as const)
+      : Object.entries(source);
+
+    for (const [key, value] of entries) {
+      const current = target[key];
+      if (isPlainObject(value) && isPlainObject(current)) {
+        merge(current, value);
+      } else if (Array.isArray(value) && Array.isArray(current)) {
+        value.forEach((item, index) => {
+          current[index] = isPlainObject(item) && isPlainObject(current[index])
+            ? merge(current[index], item)
+            : item;
+        });
+      } else if (value !== undefined) {
+        target[key] = value;
+      }
+    }
+  }
+  return target;
+}
+
+function escapeHtml(value: string): string {
+  const entities: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+  return value.replace(/[&<>"']/g, char => entities[char]);
+}
+
+function getValue(data: any, path: string): any {
+  return path.split('.').reduce((value, key) => (value == null ? undefined : value[key.trim()]), data);
+}
 
 export function generateId() {
   const PUSH_CHARS = '-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz';
@@ -129,9 +178,25 @@ export function extractValueFrom(filenamePath: string, key: string) {
   }
 }
 
-export function processTemplate(template: any, data: any) {
-  const result = _template(template);
-  return result(data)
+/**
+ * Replaces `<%= path %>` (raw) and `<%- path %>` (HTML-escaped) placeholders.
+ * Native replacement for `lodash.template`; only dot paths are supported.
+ * @example
+ * ```typescript
+ *
+ *    processTemplate('<h1><%= projectName %></h1>', { projectName: 'aio' }) // '<h1>aio</h1>'
+ *
+ * ```
+ */
+export function processTemplate(template: any, data: any = {}): string {
+  return String(template).replace(/<%([=-])\s*([\s\S]+?)\s*%>/g, (_match, kind: string, path: string) => {
+    const value = getValue(data, path);
+    if (value === undefined) {
+      console.warn(`[processTemplate] Missing value for "${path.trim()}"`);
+    }
+    const text = value === undefined ? '' : String(value);
+    return kind === '-' ? escapeHtml(text) : text;
+  });
 }
 
 

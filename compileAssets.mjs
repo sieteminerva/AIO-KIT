@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { existsSync } from "fs";
 import { copyFile, mkdir, readdir } from "fs/promises";
 import { join, resolve } from "path";
@@ -12,15 +14,15 @@ import { join, resolve } from "path";
  * @param {string} pathToCompile The path relative to the "src" directory to
  * compile. This path is also used to create the destination directory.
  */
-async function compileAssets(pathToCompile: string) {
+async function compileAssets(pathToCompile) {
   const srcRoot = join("src", pathToCompile);
   const destRoot = resolve("dest");
 
   // Use a queue to store directories to be processed
-  const dirQueue: string[] = [srcRoot];
+  const dirQueue = [srcRoot];
 
   while (dirQueue.length > 0) {
-    const currentDir = dirQueue.shift()!; // Get the next directory to process
+    const currentDir = dirQueue.shift(); // Get the next directory to process
     const relativeDir = currentDir.replace(srcRoot, ""); // remove the root path
 
     try {

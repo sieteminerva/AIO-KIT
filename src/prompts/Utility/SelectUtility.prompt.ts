@@ -1,12 +1,8 @@
 import { select } from "@inquirer/prompts";
 import { handlePromptError } from "../ErrorHandler.prompt.js";
 import { UTILITY_TASKS } from "../options.js";
-import { _ConcatFiles, _FileConverter } from "./Utility.prompt.js";
-import { SelectFileConverterPrompt } from "../FileConverter/prompt.js";
-import { CompileDeclarationsFilesPrompt } from "./CompileDeclarationsFiles.prompt.js";
-import { MainDialogPrompt } from "../main.prompt.js";
-import { ImageConverterPrompt } from "../ImageProcessor/ImageConverter.prompt.js";
-import { ImageOptimizerPrompt } from "../ImageProcessor/ImageOptimizer.prompt.js";
+
+// Task modules are imported lazily in the switch below.
 
 
 
@@ -37,21 +33,31 @@ export async function SelectUtilityPrompt(DIR: string, filename?: string, option
 
     if (task) {
       switch (task) {
-        case 'image-convert':
+        case 'image-convert': {
+          const { ImageConverterPrompt } = await import("../ImageProcessor/ImageConverter.prompt.js");
           await ImageConverterPrompt(DIR, filename as string);
           break;
-        case 'image-optimizer':
+        }
+        case 'image-optimizer': {
+          const { ImageOptimizerPrompt } = await import("../ImageProcessor/ImageOptimizer.prompt.js");
           await ImageOptimizerPrompt(DIR, filename);
           break;
-        case 'file-convert':
+        }
+        case 'file-convert': {
+          const { SelectFileConverterPrompt } = await import("../FileConverter/prompt.js");
           await SelectFileConverterPrompt(DIR, filename as string, options);
           break;
-        case 'compile':
+        }
+        case 'compile': {
+          const { CompileDeclarationsFilesPrompt } = await import("./CompileDeclarationsFiles.prompt.js");
           await CompileDeclarationsFilesPrompt(DIR, filename as string);
           break;
-        case 'back':
+        }
+        case 'back': {
+          const { MainDialogPrompt } = await import("../main.prompt.js");
           await MainDialogPrompt(filename as string, DIR);
           break;
+        }
         case 'quit':
           process.exit(0);
       }

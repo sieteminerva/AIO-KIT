@@ -1,11 +1,8 @@
 import { select } from '@inquirer/prompts';
-import { CreateProjectPrompt } from './Scaffolder/CreateProject.prompt.js';
-import { DataGeneratorPrompt } from './DataGenerator/DataGenerator.prompt.js';
 import { handlePromptError } from './ErrorHandler.prompt.js';
-import { SelectUtilityPrompt } from './Utility/SelectUtility.prompt.js';
-import { TextProcessorPrompt } from './TextProcessor/prompt.js';
-import { SelectBuildPrompt } from './Build/prompts.js';
 import { MAIN_TASKS } from './options.js';
+
+// Task modules are imported lazily in the switch below.
 
 
 
@@ -39,21 +36,31 @@ export async function MainDialogPrompt(DIR: string, filename?: string, options?:
       }))
     });
     switch (menu) {
-      case 'project':
+      case 'project': {
+        const { CreateProjectPrompt } = await import('./Scaffolder/CreateProject.prompt.js');
         await CreateProjectPrompt(filename as string);
         break;
-      case 'build':
+      }
+      case 'build': {
+        const { SelectBuildPrompt } = await import('./Build/prompts.js');
         await SelectBuildPrompt(DIR as string);
         break;
-      case 'generator':
+      }
+      case 'generator': {
+        const { DataGeneratorPrompt } = await import('./DataGenerator/DataGenerator.prompt.js');
         await DataGeneratorPrompt(DIR, null);
         break;
-      case 'utility':
+      }
+      case 'utility': {
+        const { SelectUtilityPrompt } = await import('./Utility/SelectUtility.prompt.js');
         await SelectUtilityPrompt(DIR, filename, options);
         break;
-      case 'textminator':
+      }
+      case 'textminator': {
+        const { TextProcessorPrompt } = await import('./TextProcessor/prompt.js');
         await TextProcessorPrompt();
         break;
+      }
       case 'quit':
         process.exit(0);
     }

@@ -1,19 +1,10 @@
 #!/usr/bin/env node --no-warnings
 import * as dotenv from 'dotenv';
 dotenv.config();
-import { blueBright, greenBright } from 'yoctocolors';
-import { DataGeneratorPrompt } from './prompts/DataGenerator/DataGenerator.prompt.js';
-import { SelectFileConverterPrompt } from './prompts/FileConverter/prompt.js';
-import { ImageOptimizerPrompt } from './prompts/ImageProcessor/ImageOptimizer.prompt.js';
-import { ImageConverterPrompt } from './prompts/ImageProcessor/ImageConverter.prompt.js';
-import { CreateProjectPrompt } from './prompts/Scaffolder/CreateProject.prompt.js';
-import { TextProcessorPrompt } from './prompts/TextProcessor/prompt.js';
-import { SelectUtilityPrompt } from './prompts/Utility/SelectUtility.prompt.js';
-import { MainDialogPrompt } from './prompts/main.prompt.js';
 import { Option, program as aio } from 'commander';
-import { CompileDeclarationsFilesPrompt } from './prompts/Utility/CompileDeclarationsFiles.prompt.js';
-import { SelectBuildPrompt } from './prompts/Build/prompts.js';
-// logOutlineBox(null);
+import { blueBright, greenBright } from 'yoctocolors';
+// Command modules are imported lazily inside each action, so `aio --version`
+// and `aio --help` never pay for the heavy dependency graph.
 /**
  * Defines the 'aio' command for the CLI.
  * This command serves as the entry point to display the list of all available CLI commands.
@@ -54,8 +45,9 @@ aio
     .option('--path [path]', 'destination path location')
     .description(`${greenBright(`[Usage] >>`)} Main List of the CLI Commands!`)
     .addHelpText('after', `\n'Aio Start' only starter page that contain a list of every available features.`)
-    .action((options) => {
-    MainDialogPrompt(options.name, options.path);
+    .action(async (options) => {
+    const { MainDialogPrompt } = await import('./prompts/main.prompt.js');
+    await MainDialogPrompt(options.name, options.path);
 });
 /**
  * Defines the 'new' command for the CLI.
@@ -78,8 +70,9 @@ aio
     .aliases(['n', 'N'])
     .option('-n, --name [name]', 'project name')
     .description(`${greenBright('[Usage] >>')} Scaffolding Project Structures.`)
-    .action((options) => {
-    CreateProjectPrompt(options.name);
+    .action(async (options) => {
+    const { CreateProjectPrompt } = await import('./prompts/Scaffolder/CreateProject.prompt.js');
+    await CreateProjectPrompt(options.name);
 });
 /**
  * Defines the 'generator' command for the CLI.
@@ -106,8 +99,9 @@ aio
     .option('-p, --path [path]', 'destination path location')
     .option('-s, --schema [schema]', 'data schema', undefined)
     .description(`${greenBright('[Usage] >>')} Generating Mockup Data.`)
-    .action((options) => {
-    DataGeneratorPrompt(options.path, options.schema);
+    .action(async (options) => {
+    const { DataGeneratorPrompt } = await import('./prompts/DataGenerator/DataGenerator.prompt.js');
+    await DataGeneratorPrompt(options.path, options.schema);
 });
 /**
  * Defines the 'utility' command for the CLI.
@@ -139,8 +133,9 @@ aio
     .option('-n, --name [filename]', 'file name')
     .option('-o, --options [options]', 'file conversion options')
     .description(`${greenBright('[Usage] >>')} Processing File Input`)
-    .action((options) => {
-    SelectUtilityPrompt(options.path, options.name, options.options);
+    .action(async (options) => {
+    const { SelectUtilityPrompt } = await import('./prompts/Utility/SelectUtility.prompt.js');
+    await SelectUtilityPrompt(options.path, options.name, options.options);
 });
 /**
  * Defines the 'textminator' command for the CLI.
@@ -169,8 +164,9 @@ aio
     .addOption(new Option('-e, --engine <method>', 'text processor method to use.')
     .choices(['summarized', 'translate', 'split', 'findMatch', 'purify', 'analyze', 'replace', 'merge']))
     .description(`${greenBright('[Usage] >>')} Processing Text Data Input`)
-    .action((options) => {
-    TextProcessorPrompt(options.engine);
+    .action(async (options) => {
+    const { TextProcessorPrompt } = await import('./prompts/TextProcessor/prompt.js');
+    await TextProcessorPrompt(options.engine);
 });
 aio
     .command('build')
@@ -179,8 +175,9 @@ aio
     .addOption(new Option('-e, --engine <method>', 'build processor to use.')
     .choices(['vite',]))
     .description(`${greenBright('[Usage] >>')} Project Build System.`)
-    .action((options) => {
-    SelectBuildPrompt(options.path, options);
+    .action(async (options) => {
+    const { SelectBuildPrompt } = await import('./prompts/Build/prompts.js');
+    await SelectBuildPrompt(options.path, options);
 });
 /**
  * Defines the 'file' command for the CLI.
@@ -213,8 +210,9 @@ aio
     .option('-p', '--path [path]', 'destination path location')
     .option('-o', '--options [options]', 'file conversion options')
     .description(`${greenBright('[Usage] >>')} Converting File Input to different format.`)
-    .action((options) => {
-    SelectFileConverterPrompt(options.path, options.name, options.options);
+    .action(async (options) => {
+    const { SelectFileConverterPrompt } = await import('./prompts/FileConverter/prompt.js');
+    await SelectFileConverterPrompt(options.path, options.name, options.options);
 });
 /**
  * Defines the 'publish' command for the CLI.
@@ -242,8 +240,9 @@ aio
     .option('-p, --path [path]', 'source path location')
     .option('-n, --name [filename]', 'file name')
     .description(`${greenBright('[Usage] >>')} Generate index.d.ts & index.js files`)
-    .action((options) => {
-    CompileDeclarationsFilesPrompt(options.path, options.name ? options.name : 'index');
+    .action(async (options) => {
+    const { CompileDeclarationsFilesPrompt } = await import('./prompts/Utility/CompileDeclarationsFiles.prompt.js');
+    await CompileDeclarationsFilesPrompt(options.path, options.name ? options.name : 'index');
 });
 /**
  * Defines the 'image' command for the CLI.
@@ -273,8 +272,9 @@ aio
     .option('--name [filename]', 'file name')
     .option('--path [path]', 'destination path location')
     .description(`${greenBright('[Usage] >>')} Processing Image Input.`)
-    .action((options) => {
-    ImageConverterPrompt(options.path, options.name);
+    .action(async (options) => {
+    const { ImageConverterPrompt } = await import('./prompts/ImageProcessor/ImageConverter.prompt.js');
+    await ImageConverterPrompt(options.path, options.name);
 });
 /**
  * Defines the 'optimizer' command for the CLI.
@@ -304,8 +304,9 @@ aio
     .option('-p, --path [path]', 'source path location')
     .option('-n, --name [filename]', 'file name')
     .description(`${greenBright('[Usage] >>')} Optimized image files for production.`)
-    .action((options) => {
-    ImageOptimizerPrompt(options.path, options.name);
+    .action(async (options) => {
+    const { ImageOptimizerPrompt } = await import('./prompts/ImageProcessor/ImageOptimizer.prompt.js');
+    await ImageOptimizerPrompt(options.path, options.name);
 });
 aio.parse(process.argv);
 const NO_COMMAND_SPECIFIED = aio.args.length === 0;

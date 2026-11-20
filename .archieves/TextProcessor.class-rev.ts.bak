@@ -1,0 +1,328 @@
+import { AioFileOperation } from "./FileOperation.class.js";
+import mammoth from "mammoth";
+import pdf from "pdf-parse";
+import { readFile } from "fs/promises";
+import { extname } from "path";
+import { google } from "googleapis";
+import { AuthClass } from "./Auth.class.js";
+import {
+  HarmCategory,
+  HarmBlockThreshold,
+  Content,
+  GenerateContentResult,
+} from "@google-cloud/vertexai";
+
+export interface InsertOptions {
+  [key: string]: string;
+}
+
+export interface MatchOptions {
+  matchCase?: boolean;
+  keyword: string | RegExp;
+}
+
+export interface AnalyzeResult {
+  characterCount: number;
+  wordCount: number;
+  lineCount: number;
+  uniqueWords?: number;
+}
+
+function escapeRegExp(string: string) {
+  return string.replace(/[.*+?^${}()|[\]\]/g, '\$&');
+}
+
+export interface TextProcessorOptions {
+  maxLength?: number;
+  showStatistic?: boolean;
+  maxOutputTokens?: number;
+  role?: string;
+  mimeType?: string;
+  projectId?: string;
+  location?: string;
+  apiEndpoint?: string;
+}
+
+export class AioTextProcessorRev extends AioFileOperation {
+  private _output: string = "";
+  private _options: TextProcessorOptions = {};
+  private _auth: AuthClass | undefined;
+  private static readonly DEFAULT_TEXT_MODEL = "gemini-1.5-pro";
+  private static readonly DEFAULT_TARGET_LANGUAGE = 'en-US';
+
+  constructor(options?: TextProcessorOptions) {
+    super();
+    this._options = options || {};
+    this.initAuth();
+  }
+
+  set options(value: TextProcessorOptions) {
+    this._options = value;
+  }
+
+  get options(): TextProcessorOptions {
+    return this._options;
+  }
+
+  async initAuth() {
+    this._auth = new AuthClass(this._options.projectId, this._options.location, this._options.apiEndpoint);
+  }
+
+  async summarized(filePath: string, options?: { maxLength?: number, showStatistic?: boolean }): Promise<AioTextProcessorRev> {
+    try {
+      const content = await this.read(filePath);
+
+      if (!this._auth?.vertexAI) {
+        throw new Error("Vertex AI client not initialized. Please check if the GOOGLE_APPLICATION_CREDENTIALS environment variable is set correctly.");
+      }
+
+      const textModel = AioTextProcessorRevRev.DEFAULT_TEXT_MODEL;
+      const generativeModel = this._auth.vertexAI.getGenerativeModel({
+        model: textModel,
+        safetySettings: [
+          {
+            category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+            threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+          },
+        ],
+        generationConfig: { maxOutputTokens: this._options.maxOutputTokens || 256 },
+        systemInstruction: {
+          role: 'system',
+          parts: [{ "text": `You are a helpful ${this._options.role || 'customer service agent'}.` }]
+        },
+      });
+
+      const maxLength = options?.maxLength || 200;
+      const prompt = `Summarize the following text in ${maxLength} words:\n\n${content}\n\nSummary:`;
+      const request = {
+        contents: [{
+          role: "user",
+          parts: [{ text: prompt }]
+        }] as Content[],
+      };
+
+      const result: GenerateContentResult = await generativeModel.generateContent(request);
+
+      if (result && result.response && result.response.candidates && result.response.candidates.length > 0 && result.response.candidates[0].content.parts[0].text) {
+        const generatedText = result.response.candidates[0].content.parts[0].text;
+        if (!generatedText) {
+          const errorMessage = "No text generated from the model.";
+          console.error(errorMessage);
+          throw new Error(errorMessage);
+        }
+        this.content = generatedText.trim();
+      } else {
+        const errorMessage = `Unexpected response format from Gemini API: ${JSON.stringify(result)}`;
+        console.error(errorMessage);
+        throw new Error(errorMessage);
+      }
+
+      return this;
+
+    } catch (error) {
+      console.error(`Error summarizing file ${filePath}:`, error.message || error);
+      throw error;
+    }
+  }
+
+  async translate(filePath: string, targetLanguage: string = AioTextProcessorRev.DEFAULT_TARGET_LANGUAGE): Promise<AioTextProcessorRev> {
+    try {
+      if (!/^[a-z]{2}-[A-Z]{2}$/.test(targetLanguage)) {
+        throw new Error(`Invalid target language code: ${targetLanguage}. Please use the format 'xx-XX' (e.g., 'en-US').`);
+      }
+
+      const content = await this.read(filePath);
+
+      const auth = this._auth?.auth;
+      if (!auth) {
+        throw new Error("Google API authentication failed. Please check your credentials.");
+      }
+
+      const translate = google.translate({ version: 'v3', auth });
+
+      const request = {
+        parent: `projects/${this._auth?.project_id}/locations/global`,
+        requestBody: {
+          contents: [content],
+          mimeType: this._options.mimeType || 'text/plain',
+          targetLanguageCode: targetLanguage,
+        },
+      };
+
+      const response = await translate.projects.translateText(request);
+
+      if (response.data.translations && response.data.translations.length > 0) {
+        this.content = response.data.translations[0].translatedText;
+      } else {
+        throw new Error(`No translations found in the response for file ${filePath} and target language ${targetLanguage}.`);
+      }
+
+      return this;
+    } catch (error) {
+      console.error(`Error translating file ${filePath}:`, error.message || error);
+      throw error;
+    }
+  }
+
+  async read(filePath: string): Promise<string> {
+    const fileExtension = extname(filePath).toLowerCase();
+    try {
+      if (fileExtension === ".docx") {
+        const buffer = await readFile(filePath);
+        const result = await mammoth.extractRawText({ buffer });
+        return result.value;
+      } else if (fileExtension === ".pdf") {
+        const buffer = await readFile(filePath);
+        const data = await pdf(buffer);
+        return data.text;
+      } else {
+        return await super.read(filePath);
+      }
+    } catch (error) {
+      console.error(`Error reading file ${filePath}:`, error);
+      throw error;
+    }
+  }
+
+  async merge(...filePaths: string[]): Promise<AioTextProcessorRev> {
+    let mergedContent = "";
+    for (const filePath of filePaths) {
+      try {
+        const content = await this.read(filePath);
+        mergedContent += content + "\n";
+        this.content = mergedContent;
+      } catch (error) {
+        console.error(`Error reading file ${filePath}:`, error);
+        throw error;
+      }
+    }
+    return this;
+  }
+
+  async split(filePath: string, chunkSize: number): Promise<AioTextProcessorRev> {
+    const results = [];
+    try {
+      chunkSize = Number(chunkSize);
+      const content = await this.read(filePath);
+      const numChunks = Math.ceil(content.length / chunkSize);
+      for (let i = 0; i < numChunks; i++) {
+        const start = i * chunkSize;
+        const end = Math.min((i + 1) * chunkSize, content.length);
+        const chunk = content.substring(start, end);
+        results.push(chunk);
+      }
+      this.content = results;
+      return this;
+    } catch (error) {
+      console.error(`Error splitting file ${filePath}:`, error);
+      throw error;
+    }
+  }
+
+  async compare(...filePaths: string[]): Promise<AioTextProcessorRev> {
+    if (filePaths.length > 2) {
+      throw new Error("You can only compare two files at a time.");
+    }
+    try {
+      const content1 = await this.read(filePaths[0]);
+      const content2 = await this.read(filePaths[1]);
+      const lines1 = content1.split(/\r\n|\r|\n/);
+      const lines2 = content2.split(/\r\n|\r|\n/);
+      const diff: string[] = [];
+
+      const maxLength = Math.max(lines1.length, lines2.length);
+      for (let i = 0; i < maxLength; i++) {
+        const line1 = lines1[i] || "";
+        const line2 = lines2[i] || "";
+        if (line1 !== line2) {
+          diff.push(`Line ${i + 1}:`);
+          diff.push(`- ${line1}`);
+          diff.push(`+ ${line2}`);
+        }
+      }
+      this.content = diff;
+      return this;
+    } catch (error) {
+      console.error(`Error comparing files ${filePaths[0]} and ${filePaths[1]}:`, error);
+      throw error;
+    }
+  }
+
+  async purify(filePath: string): Promise<AioTextProcessorRev> {
+    try {
+      const content = await this.read(filePath);
+      const purifiedContent = content.replace(/\s+/g, " ").trim();
+      this.content = purifiedContent;
+      return this;
+    } catch (error) {
+      console.error(`Error purifying file ${filePath}:`, error);
+      throw error;
+    }
+  }
+
+  async analyze(filePath: string): Promise<AioTextProcessorRev> {
+    try {
+      const content = await this.read(filePath);
+      const characterCount = content.length;
+      const wordCount = content.trim().split(/\s+/).filter(word => word.length > 0).length;
+      const lineCount = content.split(/\r\n|\r|\n/).length;
+      const uniqueWords = new Set(content.toLowerCase().match(/\b\w+\b/g)).size;
+      this.content = { characterCount, wordCount, lineCount, uniqueWords } as AnalyzeResult;
+      return this;
+    } catch (error) {
+      console.error(`Error analyzing file ${filePath}:`, error);
+      throw error;
+    }
+  }
+
+  async findMatch(filePath: string, matchOptions: MatchOptions): Promise<AioTextProcessorRev> {
+    try {
+      const content = await this.read(filePath);
+      const lines = content.split(/\r\n|\r|\n/);
+      const matchingLines: string[] = [];
+      const { keyword, matchCase = true } = matchOptions;
+      const regex = keyword instanceof RegExp ? keyword : new RegExp(keyword, matchCase ? "" : "i");
+
+      for (const line of lines) {
+        if (regex.test(line)) {
+          matchingLines.push(line);
+        }
+      }
+      this.content = matchingLines;
+
+      return this;
+    } catch (error) {
+      console.error(`Error finding matches in file ${filePath}:`, error);
+      throw error;
+    }
+  }
+
+  async replace(filePath: string, replaceOptions: { [key: string]: string }[]): Promise<AioTextProcessorRev> {
+    try {
+      const content = await this.read(filePath);
+      let modifiedContent = content;
+
+      if (!Array.isArray(replaceOptions)) {
+        throw new Error("replaceOptions must be an array of key-value pairs.");
+      }
+
+      for (const option of replaceOptions) {
+        for (const tag in option) {
+          const value = option[tag];
+          const escapedTag = escapeRegExp(tag);
+          modifiedContent = modifiedContent.replace(new RegExp(escapedTag, "g"), value);
+        }
+      }
+
+      this.content = modifiedContent;
+      return this;
+    } catch (error) {
+      console.error(`Error replacing text in file ${filePath}:`, error);
+      throw error;
+    }
+  }
+
+  async format(filePath: string) {
+    return this;
+  }
+}

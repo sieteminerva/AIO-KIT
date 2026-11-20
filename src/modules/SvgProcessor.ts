@@ -1,7 +1,7 @@
-import { optimize, type Config, type PluginConfig } from 'svgo';
+import type { Config, PluginConfig } from 'svgo';
 import { resolve } from 'path';
 import { AioFileOperation } from '../class/FileOperation.class.js';
-import { ImageOptions } from '../class/ImageProcessor.class.js';
+import type { ImageOptions } from '../class/ImageProcessor.class.js';
 
 export interface SvgOptions extends Omit<ImageOptions, 'preset'> {
   preset?: string;
@@ -37,7 +37,7 @@ export class SvgProcessor extends AioFileOperation {
       const optimizedPath = this.filepath.replace(this.filename, 'optimized/' + optimizedFilename);
 
       // Pass the initial options to standard file optimization
-      const optimizedSvgMarkup = this.optimizeSvg(svgString, options);
+      const optimizedSvgMarkup = await this.optimizeSvg(svgString, options);
 
       if (optimizedSvgMarkup) {
         await this.write(optimizedPath, optimizedSvgMarkup);
@@ -45,7 +45,7 @@ export class SvgProcessor extends AioFileOperation {
 
         if (options.preset === 'css-icon') {
           // FIX: Pass asDataUri = true, but also modify or adapt options for the custom preset rules
-          const cssSvgDataUri = this.optimizeSvg(svgString, options, true);
+          const cssSvgDataUri = await this.optimizeSvg(svgString, options, true);
           await this.writeCssPreset(cssSvgDataUri, options);
         }
       } else {
@@ -57,7 +57,7 @@ export class SvgProcessor extends AioFileOperation {
     }
   }
 
-  private optimizeSvg(svgString: string, options: SvgOptions, asDataUri = false): string {
+  private async optimizeSvg(svgString: string, options: SvgOptions, asDataUri = false): Promise<string> {
     const overrides: Record<string, boolean | undefined | object> = {}; // Izinkan object untuk override kompleks
 
     // Map regular options
@@ -114,6 +114,8 @@ export class SvgProcessor extends AioFileOperation {
       config.datauri = 'enc';
     }
 
+    // svgo is heavy (~770ms); load it only when an SVG is actually optimized
+    const { optimize } = await import('svgo');
     return optimize(svgString, config).data;
   }
 

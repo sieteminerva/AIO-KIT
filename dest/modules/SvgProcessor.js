@@ -1,4 +1,3 @@
-import { optimize } from 'svgo';
 import { resolve } from 'path';
 import { AioFileOperation } from '../class/FileOperation.class.js';
 export class SvgProcessor extends AioFileOperation {
@@ -14,13 +13,13 @@ export class SvgProcessor extends AioFileOperation {
             const optimizedFilename = this.filename + '_optimized';
             const optimizedPath = this.filepath.replace(this.filename, 'optimized/' + optimizedFilename);
             // Pass the initial options to standard file optimization
-            const optimizedSvgMarkup = this.optimizeSvg(svgString, options);
+            const optimizedSvgMarkup = await this.optimizeSvg(svgString, options);
             if (optimizedSvgMarkup) {
                 await this.write(optimizedPath, optimizedSvgMarkup);
                 console.log(`Successfully optimized SVG: ${optimizedPath}`);
                 if (options.preset === 'css-icon') {
                     // FIX: Pass asDataUri = true, but also modify or adapt options for the custom preset rules
-                    const cssSvgDataUri = this.optimizeSvg(svgString, options, true);
+                    const cssSvgDataUri = await this.optimizeSvg(svgString, options, true);
                     await this.writeCssPreset(cssSvgDataUri, options);
                 }
             }
@@ -33,7 +32,7 @@ export class SvgProcessor extends AioFileOperation {
             throw error;
         }
     }
-    optimizeSvg(svgString, options, asDataUri = false) {
+    async optimizeSvg(svgString, options, asDataUri = false) {
         const overrides = {}; // Izinkan object untuk override kompleks
         // Map regular options
         if (options.cleanupIDs !== undefined)
@@ -86,6 +85,8 @@ export class SvgProcessor extends AioFileOperation {
         if (asDataUri) {
             config.datauri = 'enc';
         }
+        // svgo is heavy (~770ms); load it only when an SVG is actually optimized
+        const { optimize } = await import('svgo');
         return optimize(svgString, config).data;
     }
     async writeCssPreset(dataUri, options) {

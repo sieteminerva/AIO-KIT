@@ -1,6 +1,6 @@
-import { type PluginConfig } from 'svgo';
+import type { PluginConfig } from 'svgo';
 import { AioFileOperation } from '../class/FileOperation.class.js';
-import { ImageOptions } from '../class/ImageProcessor.class.js';
+import type { ImageOptions } from '../class/ImageProcessor.class.js';
 export interface SvgOptions extends Omit<ImageOptions, 'preset'> {
     preset?: string;
     cleanupIDs?: boolean;

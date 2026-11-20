@@ -76,7 +76,7 @@ export declare function createGuest(): {
     suffix: string;
     event: "-L6Q_cMVyOR0ol1rvCZg" | "-L6Q_cMVyOR0ol1rvCZh" | "-L6Q_cMVyOR0ol1rvCZi";
     gender: "male" | "female";
-    category: "vip" | "friend" | "client" | "family";
+    category: "client" | "vip" | "friend" | "family";
     email: string;
     phone_number: string;
     address: {
@@ -133,7 +133,7 @@ export declare function createTodo(): {
  * ```
  */
 export declare function createPlace(): {
-    category: "hotel" | "bistro" | "sport centre" | "restaurant" | "pool" | "multifunction";
+    category: "pool" | "hotel" | "bistro" | "sport centre" | "restaurant" | "multifunction";
     name: string;
     area: string;
     address: {

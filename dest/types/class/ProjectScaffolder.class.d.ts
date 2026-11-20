@@ -40,4 +40,5 @@ export declare class AioProjectScaffolder {
      * ```
      */
     WebProject(DIR: string): void;
+    CliCommand(): void;
 }

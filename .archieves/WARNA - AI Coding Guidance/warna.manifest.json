@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org",
+  "name": "my-agentic-workspace",
+  "version": "1.0.0",
+  "governance": {
+    "guidanceDir": ".guidance",
+    "docsDir": ".docs",
+    "boardMode": "team",
+    "boardTtl": "24h",
+    "maxBoardPoints": 3,
+    "maxBoardLines": 8
+  },
+  "stitching": {
+    "enabled": true,
+    "outputFile": ".docs/catalogue.json",
+    "targetFileName": "readme.md",
+    "readmeSpecsIn": [
+      "folder-a/library/components",
+      "folder-a/library/hooks",
+      "folder-e/orchestrators"
+    ],
+    "ignoreDirs": [
+      "node_modules",
+      "dist",
+      ".git",
+      "__tests__"
+    ],
+    "requiredSections": [
+      "## Props",
+      "## Usage"
+    ]
+  },
+  "rituals": {
+    "gitLogCount": 5,
+    "sessionNotesFile": ".docs/session-notes.txt",
+    "verifyPipeline": [
+      "npm run stitch",
+      "npm run session:end"
+    ]
+  }
+}

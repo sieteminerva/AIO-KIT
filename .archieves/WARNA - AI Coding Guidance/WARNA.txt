@@ -1,0 +1,6 @@
+# WARNA
+### **W**orkflow **A**rchitecture for **R**outing **N**ative **A**gents
+
+> *Workspace-Agnostic Rules for Navigating Agents — powered by deterministic Work Agreements, Rituals, & Navigation for Agents.*
+
+**WARNA** is a lightweight, zero-dependency Spec-Driven Development (SDD) & Multi-Agent Orchestration harness for monorepos and engineering teams. Just like blending distinct colors into a cohesive spectrum, WARNA orchestrates diverse AI models—combining high-reasoning paid models, cost-efficient coding agents, and free-tier utilities—into a single, token-optimized workflow without context rot or cross-agent deadlocks.

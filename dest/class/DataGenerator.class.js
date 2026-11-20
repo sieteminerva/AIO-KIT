@@ -1,7 +1,6 @@
-import { merge } from "lodash-es";
 import { createAisScema } from "../lib/schema/ais.schema.js";
 import { createSchema } from "../lib/schema/generic.schema.js";
-import { generateId } from "../lib/scripts/util.js";
+import { generateId, merge } from "../lib/scripts/util.js";
 export class AioDataGenerator {
     constructor() {
     }

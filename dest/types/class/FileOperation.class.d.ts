@@ -1,5 +1,31 @@
 import { FileHandle } from "node:fs/promises";
 import { Dirent } from "node:fs";
+interface ListRecursiveOptions {
+    includes?: string[];
+    excludes?: string[];
+    _result?: string[];
+}
+/**
+ * Immutable, chainable path builder.
+ * @example
+ * ```typescript
+ *
+ *    AioFileOperation.path('src', 'class').join('FileOperation.class.ts').resolve()
+ *
+ * ```
+ */
+export declare class FileSystemPath {
+    private value;
+    private _cachedNormalized;
+    constructor(...value: string[]);
+    get normalized(): string;
+    join(...args: string[]): FileSystemPath;
+    resolve(): string;
+    relativeTo(root: string): string;
+    escape(): string;
+    toString(): string;
+    valueOf(): string;
+}
 export declare class AioFileOperation {
     protected _root: string;
     filepath: string | undefined;
@@ -156,4 +182,46 @@ export declare class AioFileOperation {
      * ```
      */
     remove(filePath: string): Promise<void>;
+    /**
+     * Builds an absolute path from a module `import.meta.url` plus sub-paths.
+     * @example
+     * ```typescript
+     *
+     *    AioFileOperation.fromMeta(import.meta.url, 'templates') // '/abs/dir/templates'
+     *
+     * ```
+     */
+    static fromMeta(metaUrl: string, ...paths: string[]): string;
+    /** Joins path segments and normalizes separators to forward slashes. */
+    static normalize(...path: string[]): string;
+    /** Resolves `to` relative to `from` and normalizes separators. */
+    static relative(from: string, to: string): string;
+    /** Resolves path segments to an absolute path with forward slashes. */
+    static resolve(...paths: string[]): string;
+    /** Escapes a string for safe use inside a RegExp. */
+    static regexEscape(str: string): string;
+    /** Normalized alias of `path.join`. */
+    static join(...args: string[]): string;
+    /** Starts a chainable {@link FileSystemPath}. */
+    static path(...str: string[]): FileSystemPath;
+    static readJson<T>(path: string | FileSystemPath): T;
+    static writeJson(path: string | FileSystemPath, value: unknown): void;
+    static exists(path: string | FileSystemPath): boolean;
+    static ensureDirectory(path: string | FileSystemPath): void;
+    static remove(path: string | FileSystemPath): void;
+    static removeRecursive(path: string | FileSystemPath): void;
+    static read(path: string | FileSystemPath): string;
+    static write(path: string | FileSystemPath, content: string): void;
+    static copy(src: string | FileSystemPath, dest: string | FileSystemPath): void;
+    static move(src: string | FileSystemPath, dest: string | FileSystemPath): void;
+    static list(dir: string | FileSystemPath): string[];
+    /** Recursively lists files, reusing one output array to save RAM. */
+    static listRecursive(dir: string | FileSystemPath, filter?: (path: string) => boolean, result?: string[]): string[];
+    /** Recursively lists files with `includes` / `excludes` pattern matching. */
+    static listRecursiveX(dir: string, filter?: (path: string) => boolean, options?: ListRecursiveOptions): string[];
+    /** Streams files recursively without buffering the whole tree in memory. */
+    static listRecursiveAsync(dir: string, filter?: (path: string) => boolean): AsyncGenerator<string>;
+    /** Removes a path (file or directory) recursively. */
+    static clean(...path: string[]): void;
 }
+export {};
