@@ -2,5 +2,5 @@
  * @module FileConverter
  */
 export * from "../class/FileConverter.class";
-export * from "../prompts/FileConverter/FileConverter.prompt";
-export * from "../prompts/FileConverter/prompt";
+export * from "../prompts/File/FileConverter.prompt";
+export * from "../prompts/File/prompt";

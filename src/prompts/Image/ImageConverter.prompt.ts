@@ -26,9 +26,11 @@ import { Dirent } from "fs";
 export async function ImageConverterPrompt(filepath: string, filename: string): Promise<void> {
 
   try {
+    // `resolve` handles relative and already-absolute input, so a `DIR` coming
+    // from the menu dialogs (absolute `process.cwd()`) is never joined twice.
     const DIR = filepath
-      ? resolve(join(process.cwd(), filepath, filename))
-      : join(process.cwd());
+      ? resolve(filepath, filename ?? '')
+      : process.cwd();
 
     // 1. Initialize the image converter.
     const converter = new AioImageProcessor();

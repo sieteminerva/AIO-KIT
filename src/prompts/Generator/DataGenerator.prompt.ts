@@ -7,6 +7,7 @@ import { DATA_TYPES } from "../options.js";
 import { writeFileTo } from "../../lib/scripts/util.js";
 import { SchemaBuilderPrompt } from "./SchemaBuilder.prompt.js";
 import { MainDialogPrompt } from "../main.prompt.js";
+import { CssIconGeneratorPrompt } from "./CssIconGenerator.prompt.js";
 
 /** 
  * `DataGeneratorPrompt` is an asynchronous function that orchestrates the process of generating data based on user input.
@@ -54,6 +55,7 @@ export async function DataGeneratorPrompt(DIR: string, schema?: any) {
     const choices = [
       ...DATA_TYPES.map((menu: any) => ({ name: menu.name, value: menu.value })),
       new Separator(yellow('--------------------------')), // Add the separator here
+      { name: `${greenBright('CSS icon')}`, value: 'css-icon' },
       { name: `Custom ${greenBright(' [Schema Builder]')}`, value: 'custom' },
       { value: 'back', name: `Back to ${yellowBright('[Start]')}` },
       { value: 'quit', name: `${yellowBright('[Quit]')}` },
@@ -66,7 +68,10 @@ export async function DataGeneratorPrompt(DIR: string, schema?: any) {
 
     if (dataType === 'custom') {
       return await SchemaBuilderPrompt(DEST);
-    } else if (dataType === 'back') {
+    } else if (dataType === 'css-icon') {
+      return await CssIconGeneratorPrompt(DEST);
+    }
+    else if (dataType === 'back') {
       await MainDialogPrompt(DEST);
     } else if (dataType === 'quit') {
       process.exit(0);

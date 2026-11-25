@@ -159,6 +159,8 @@ export class AioFileOperation {
      *                                              If undefined, no extension filtering is applied.
      * @param {boolean} [showDir=false] - If true, directories will be included in the results.
      *                                    Defaults to false.
+     * @param {string[]} [ignore] - Directory names to skip. Defaults to {@link IGNORED_DIRS}
+     *                              (`node_modules`, `.git`).
      * @returns {Promise<Dirent[]>} - A promise that resolves to an array of Dirent objects representing the found files.
      * @throws {Error} - Throws an error if there is a problem accessing the directory, except for 'ENOENT' errors.
      * @example
@@ -171,13 +173,20 @@ export class AioFileOperation {
      *    const txtAndMdFiles = await fileOp.search('mydir', ['.txt', '.md']);
      *    // Search for all files and directories in the 'mydir' directory
      *    const allFilesAndDirs = await fileOp.search('mydir', undefined, true);
+     *    // Skip extra folders too:
+     *    const noDocs = await fileOp.search('mydir', '.png', false, ['node_modules', '.git', 'docs']);
      *
      * ```
      */
-    async search(directory, ext, showDir = false) {
+    async search(directory, ext, showDir = false, ignore = AioFileOperation.IGNORED_DIRS) {
         try {
             const files = await readdir(directory, { withFileTypes: true, recursive: true, encoding: 'utf-8' });
             const targetedFiles = files.filter((file) => {
+                // Skip anything living inside an ignored directory (node_modules, .git, ...)
+                const parent = relative(directory, file.parentPath ?? directory);
+                if (parent.split(/[\\/]/).some((segment) => ignore.includes(segment))) {
+                    return false;
+                }
                 if (!file.isFile()) {
                     return showDir; // Exclude directories
                 }
@@ -566,3 +575,9 @@ export class AioFileOperation {
         }
     }
 }
+/**
+ * Directory names never included in {@link search} results.
+ * Recursive scans of a project root would otherwise pick up images/assets
+ * from `node_modules` and `.git`.
+ */
+AioFileOperation.IGNORED_DIRS = ['node_modules', '.git'];

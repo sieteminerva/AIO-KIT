@@ -3,6 +3,7 @@ import { green, cyan } from 'yoctocolors';
 import { join } from "path";
 import { PROJECT_TYPES } from "../options.js";
 import { AioProjectScaffolder } from "../../class/ProjectScaffolder.class.js";
+import { AioWarna } from "../../class/CreateWarna.class.js";
 import { handlePromptError } from "../ErrorHandler.prompt.js";
 import { MainDialogPrompt } from "../main.prompt.js";
 
@@ -36,6 +37,9 @@ export async function CreateProjectPrompt(name: string) {
       });
       if (projectType) {
         switch (projectType) {
+          case 'warna':
+            AioWarna.init({ cwd: DEST_DIR });
+            break;
           case 'design':
             scaffolder.DesignProject(DEST_DIR)
             break;

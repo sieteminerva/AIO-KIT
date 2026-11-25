@@ -34,17 +34,17 @@ export async function SelectUtilityPrompt(DIR: string, filename?: string, option
     if (task) {
       switch (task) {
         case 'image-convert': {
-          const { ImageConverterPrompt } = await import("../ImageProcessor/ImageConverter.prompt.js");
+          const { ImageConverterPrompt } = await import("../Image/ImageConverter.prompt.js");
           await ImageConverterPrompt(DIR, filename as string);
           break;
         }
         case 'image-optimizer': {
-          const { ImageOptimizerPrompt } = await import("../ImageProcessor/ImageOptimizer.prompt.js");
+          const { ImageOptimizerPrompt } = await import("../Image/ImageOptimizer.prompt.js");
           await ImageOptimizerPrompt(DIR, filename);
           break;
         }
         case 'file-convert': {
-          const { SelectFileConverterPrompt } = await import("../FileConverter/prompt.js");
+          const { SelectFileConverterPrompt } = await import("../File/prompt.js");
           await SelectFileConverterPrompt(DIR, filename as string, options);
           break;
         }

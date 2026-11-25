@@ -1,0 +1,15 @@
+# Abaikan folder eksperimen dan build artifacts agar tidak membebani environment details Cline
+folder-e/
+node_modules/
+dist/
+build/
+.git/
+
+# Abaikan arsip catatan lama di .docs agar Cline hanya fokus pada catalogue.json
+.docs/*.txt
+.docs/archive/
+
+# Abaikan folder showcase/consumer app jika sedang fokus mengerjakan library inti
+# (Hapus tanda # di bawah ini jika ingin mengisolasi Cline khusus di folder-a)
+# folder-b/
+# folder-c/

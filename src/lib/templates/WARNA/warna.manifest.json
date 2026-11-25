@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org",
+  "name": "warna-workspace",
+  "version": "1.1.0",
+  "framework": "WARNA — Workflow Architecture for Routing Native Agents",
+  "governance": {
+    "guidanceDir": ".guidance",
+    "mandatoryDir": ".guidance/mandatory",
+    "projectDir": ".guidance/project",
+    "docsDir": ".docs",
+    "scriptsDir": "scripts",
+    "manifestFile": ".guidance/manifest.json",
+    "warnaDoc": ".guidance/warna.md",
+    "boardFile": ".guidance/project/REGISTRY.md",
+    "readmeDoc": ".guidance/project/README.md",
+    "taskPattern": "^TASK.*\\.md$",
+    "readOnlyZones": [
+      "docs",
+      ".archieves"
+    ],
+    "ephemeralZones": [
+      ".temp"
+    ],
+    "boardMode": "team",
+    "boardTtl": "24h",
+    "limits": {
+      "statusMaxLines": 45,
+      "statusMaxCards": 3,
+      "statusMaxCardLines": 4,
+      "planMaxLines": 60,
+      "planMaxActiveItems": 3,
+      "planMaxItemLines": 2,
+      "taskMaxLines": 50,
+      "memoryMaxLines": 12,
+      "checkpointLines": 3
+    }
+  },
+  "overrideConditions": {
+    "existingWins": true,
+    "warnOnMisplacedExisting": true,
+    "alternativePaths": {
+      "AGENTS.md": [
+        ".guidance/AGENTS.md",
+        ".guidance/agent.md"
+      ],
+      ".guidance/AGENTS_RULES.md": [
+        ".guidance/AGENT_RULES.md"
+      ],
+      ".guidance/manifest.json": [
+        "warna.manifest.json",
+        ".guidance/warna.manifest.json"
+      ],
+      ".guidance/warna.md": [
+        "warna.md"
+      ],
+      ".guidance/project/PLAN.md": [
+        ".guidance/PLAN.md",
+        ".guidance/plan.md",
+        "PLAN.md"
+      ],
+      ".guidance/project/README.md": [
+        ".guidance/project/readme.md",
+        ".guidance/readme.md",
+        ".guidance/README.md"
+      ],
+      ".guidance/project/STATUS.md": [
+        ".guidance/STATUS.md",
+        "STATUS.md"
+      ],
+      ".guidance/project/REGISTRY.md": [
+        ".guidance/project/BOARDS.md",
+        ".guidance/project/AGENTS.md",
+        "BOARDS.md"
+      ]
+    },
+    "detectExistingTaskPattern": "^TASK.*\\.md$"
+  },
+  "dimensions": [
+    {
+      "name": "Guidance",
+      "paths": [
+        ".guidance/**"
+      ],
+      "router": "AGENTS.md"
+    },
+    {
+      "name": "Rituals & Scripts",
+      "paths": [
+        "scripts/**"
+      ],
+      "router": "scripts/session.mjs"
+    },
+    {
+      "name": "Source",
+      "paths": [
+        "src/**",
+        "app/**",
+        "packages/**",
+        "project/**"
+      ],
+      "router": "AGENTS.md"
+    }
+  ],
+  "catalogue": {
+    "enabled": true,
+    "scanDir": ".",
+    "readmeSrc": [
+      "project",
+      "packages",
+      "src",
+      "app"
+    ],
+    "targetFileName": "README.md",
+    "outputFile": ".docs/catalogue.json",
+    "scopePrefix": "",
+    "ignoreDirs": [
+      "node_modules",
+      "dist",
+      "build",
+      ".git",
+      ".temp",
+      ".archieves",
+      "docs",
+      ".guidance",
+      "__tests__"
+    ],
+    "requiredSections": [
+      "## Purpose",
+      "## Entry & Contract"
+    ]
+  },
+  "rituals": {
+    "gitLogCount": 8,
+    "sessionNotesFile": ".temp/session-notes.txt",
+    "verifyCommand": "node scripts/session.mjs lint",
+    "verifyPipeline": [
+      "node scripts/session.mjs lint",
+      "node scripts/catalogue.mjs --check"
+    ]
+  }
+}

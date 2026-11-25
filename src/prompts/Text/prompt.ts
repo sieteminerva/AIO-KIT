@@ -48,6 +48,12 @@ export async function TextProcessorPrompt(engine?: AioTextProcessorMethods) {
     const engineName: AioTextProcessorMethods | string | undefined = engine ? engine : await CreateSelectEnginePrompt();
     console.log('Selected Text Processor :', greenBright(`${engineName}`));
 
+    // OCR reads images, not text documents, so branch before the text file search
+    if (engineName === 'ocr') {
+      const { ImageToTextPrompt } = await import('./components/ImageToText.prompt.js');
+      return await ImageToTextPrompt(DIR);
+    }
+
     // Search for files
     const allowed_extensions = ['.txt', '.pdf', '.doc', '.docx', '.md', '.rtf'];
     const folder = await processor.search(DIR, allowed_extensions, false) as Dirent[];

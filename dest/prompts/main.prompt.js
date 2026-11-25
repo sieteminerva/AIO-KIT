@@ -31,7 +31,7 @@ export async function MainDialogPrompt(DIR, filename, options) {
         });
         switch (menu) {
             case 'project': {
-                const { CreateProjectPrompt } = await import('./Scaffolder/CreateProject.prompt.js');
+                const { CreateProjectPrompt } = await import('./New/CreateProject.prompt.js');
                 await CreateProjectPrompt(filename);
                 break;
             }
@@ -41,7 +41,7 @@ export async function MainDialogPrompt(DIR, filename, options) {
                 break;
             }
             case 'generator': {
-                const { DataGeneratorPrompt } = await import('./DataGenerator/DataGenerator.prompt.js');
+                const { DataGeneratorPrompt } = await import('./Generator/DataGenerator.prompt.js');
                 await DataGeneratorPrompt(DIR, null);
                 break;
             }
@@ -50,8 +50,8 @@ export async function MainDialogPrompt(DIR, filename, options) {
                 await SelectUtilityPrompt(DIR, filename, options);
                 break;
             }
-            case 'textminator': {
-                const { TextProcessorPrompt } = await import('./TextProcessor/prompt.js');
+            case 'text': {
+                const { TextProcessorPrompt } = await import('./Text/prompt.js');
                 await TextProcessorPrompt();
                 break;
             }

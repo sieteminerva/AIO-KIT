@@ -1,4 +1,3 @@
-import { resolve } from 'path';
 import { AioFileOperation } from '../class/FileOperation.class.js';
 export class SvgProcessor extends AioFileOperation {
     async process(filepath, options = {}) {
@@ -17,11 +16,6 @@ export class SvgProcessor extends AioFileOperation {
             if (optimizedSvgMarkup) {
                 await this.write(optimizedPath, optimizedSvgMarkup);
                 console.log(`Successfully optimized SVG: ${optimizedPath}`);
-                if (options.preset === 'css-icon') {
-                    // FIX: Pass asDataUri = true, but also modify or adapt options for the custom preset rules
-                    const cssSvgDataUri = await this.optimizeSvg(svgString, options, true);
-                    await this.writeCssPreset(cssSvgDataUri, options);
-                }
             }
             else {
                 console.warn(`SVG optimization failed for: ${optimizedPath}`);
@@ -31,6 +25,29 @@ export class SvgProcessor extends AioFileOperation {
             console.error(`Error processing SVG: ${this.filepath}`, error);
             throw error;
         }
+    }
+    /**
+     * Builds a single CSS icon rule (`mask-image` with an inlined SVG data URI)
+     * for the given SVG file. Pure: nothing is written to disk.
+     *
+     * @param filepath - Path of the source `.svg` file.
+     * @param options - SVG options; `preset` is always forced to `css-icon`.
+     * @returns The generated CSS rule (selector + mask-image declaration).
+     * @example
+     * ```typescript
+     * const rule = await new SvgProcessor().collect('./icons/home.svg', { cssStyle: 'color: currentColor;' });
+     * ```
+     */
+    async collect(filepath, options = {}) {
+        this.filepath = filepath;
+        this.filename = this._getFilename(this.filepath);
+        this.ext = this._getExtension(this.filepath);
+        if (this.ext !== '.svg') {
+            throw new Error(`Unsupported file format: ${this.ext}`);
+        }
+        const svgString = await this.read(filepath);
+        const dataUri = await this.optimizeSvg(svgString, { ...options, preset: 'css-icon' }, true);
+        return this.createCssRule(dataUri, options.cssClassPrefix ?? 'icon', this.dotify(this.filename), options.cssStyle);
     }
     async optimizeSvg(svgString, options, asDataUri = false) {
         const overrides = {}; // Izinkan object untuk override kompleks
@@ -88,16 +105,6 @@ export class SvgProcessor extends AioFileOperation {
         // svgo is heavy (~770ms); load it only when an SVG is actually optimized
         const { optimize } = await import('svgo');
         return optimize(svgString, config).data;
-    }
-    async writeCssPreset(dataUri, options) {
-        const cssOutputPath = options.cssOutputPath ?? resolve(process.cwd(), 'aio-icon.css');
-        const classPrefix = options.cssClassPrefix ?? 'icon';
-        const iconName = this.dotify(this.filename);
-        const cssRule = this.createCssRule(dataUri, classPrefix, iconName, options.cssStyle);
-        const existingContent = await this.read(cssOutputPath).catch(() => '');
-        const nextContent = existingContent ? `${existingContent}\n\n${cssRule}` : cssRule;
-        await this.write(cssOutputPath, nextContent);
-        console.log(`Successfully generated CSS icon preset: ${cssOutputPath}`);
     }
     createCssRule(dataUri, classPrefix, iconName, cssStyle) {
         // FIX: Replaced formatting style to support optional inline styles cleanly

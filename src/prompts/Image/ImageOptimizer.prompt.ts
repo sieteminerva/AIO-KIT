@@ -1,6 +1,5 @@
 import { number, select } from "@inquirer/prompts";
-import { dirname, extname, join, resolve } from "path";
-import { writeFile } from "node:fs/promises";
+import { extname, resolve } from "path";
 import { greenBright, red } from "yoctocolors";
 import { AioImageProcessor, ImageOptions } from "../../class/ImageProcessor.class.js";
 import { handlePromptError } from "../ErrorHandler.prompt.js";
@@ -35,8 +34,8 @@ export async function ImageOptimizerPrompt(filepath: string, filename: string = 
     };
 
     const DIR = filepath
-      ? resolve(join(process.cwd(), filepath, filename))
-      : join(process.cwd());
+      ? resolve(filepath, filename ?? '')
+      : process.cwd();
 
     const converter = new AioImageProcessor();
 
@@ -111,17 +110,13 @@ export async function ImageOptimizerPrompt(filepath: string, filename: string = 
 
       const svgOptions = await SetSvgPresetsPrompt();
       if (Array.isArray(fileSelected) && fileSelected.length > 0) {
-        const cssFilePath = resolve(join(dirname(fileSelected[0]), 'aio-icon.css'));
-        svgOptions.cssOutputPath = cssFilePath;
-        await writeFile(cssFilePath, '', 'utf8');
-
         console.clear();
         const svgProcessor = new SvgProcessor();
         svgProcessor.cleanDir("optimized");
         for (const filepath of fileSelected) {
           await svgProcessor.process(filepath, svgOptions);
         }
-        const msg = greenBright(`${fileSelected.length} SVG files successfully optimized and collected into aio-icon.css.`);
+        const msg = greenBright(`${fileSelected.length} SVG files successfully optimized.`);
         console.log(msg);
       } else {
         console.log(red('No SVG files selected for optimization.'));

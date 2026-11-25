@@ -1,4 +1,4 @@
-import { yellowBright } from "yoctocolors";
+import { greenBright, yellowBright } from "yoctocolors";
 
 export const BUILD_TYPES = [
   { name: 'Vite', value: 'vite' },
@@ -18,6 +18,7 @@ export const VITE_PROJECT_TYPES = [
 export const PROJECT_TYPES = [
   { name: 'Design', value: 'design' },
   { name: 'Website', value: 'website' },
+  { name: 'WARNA Workspace', value: 'warna' },
   { name: 'Hybrid Mobile Apps', value: 'mobile' },
   { name: `Back to ${yellowBright('[Start]')}`, value: 'back' },
   { name: `${yellowBright('[Quit]')}`, value: 'quit' }
@@ -33,6 +34,7 @@ export const TEXT_PROCESSOR_TASKS = [
   { name: 'Compare Text', value: 'compare' },
   { name: 'Analyze Text', value: 'analyze' },
   { name: 'Find Match in Text', value: 'findMatch' },
+  { name: `${greenBright('Generate Text from Image')}`, value: 'ocr' },
   // 'format',
   { name: `Back to ${yellowBright('[Start]')}`, value: 'back' },
   { name: `${yellowBright('[Quit]')}`, value: 'quit' }

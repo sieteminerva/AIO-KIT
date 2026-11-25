@@ -71,7 +71,7 @@ aio
     .option('-n, --name [name]', 'project name')
     .description(`${greenBright('[Usage] >>')} Scaffolding Project Structures.`)
     .action(async (options) => {
-    const { CreateProjectPrompt } = await import('./prompts/Scaffolder/CreateProject.prompt.js');
+    const { CreateProjectPrompt } = await import('./prompts/New/CreateProject.prompt.js');
     await CreateProjectPrompt(options.name);
 });
 /**
@@ -100,7 +100,7 @@ aio
     .option('-s, --schema [schema]', 'data schema', undefined)
     .description(`${greenBright('[Usage] >>')} Generating Mockup Data.`)
     .action(async (options) => {
-    const { DataGeneratorPrompt } = await import('./prompts/DataGenerator/DataGenerator.prompt.js');
+    const { DataGeneratorPrompt } = await import('./prompts/Generator/DataGenerator.prompt.js');
     await DataGeneratorPrompt(options.path, options.schema);
 });
 /**
@@ -165,7 +165,7 @@ aio
     .choices(['summarized', 'translate', 'split', 'findMatch', 'purify', 'analyze', 'replace', 'merge']))
     .description(`${greenBright('[Usage] >>')} Processing Text Data Input`)
     .action(async (options) => {
-    const { TextProcessorPrompt } = await import('./prompts/TextProcessor/prompt.js');
+    const { TextProcessorPrompt } = await import('./prompts/Text/prompt.js');
     await TextProcessorPrompt(options.engine);
 });
 aio
@@ -206,12 +206,12 @@ aio
 aio
     .command('file')
     .aliases(['f', 'F'])
-    .option('-n', '--name [filename]', 'file name')
+    .option('-n, --name [filename]', 'file name')
     .option('-p', '--path [path]', 'destination path location')
     .option('-o', '--options [options]', 'file conversion options')
     .description(`${greenBright('[Usage] >>')} Converting File Input to different format.`)
     .action(async (options) => {
-    const { SelectFileConverterPrompt } = await import('./prompts/FileConverter/prompt.js');
+    const { SelectFileConverterPrompt } = await import('./prompts/File/prompt.js');
     await SelectFileConverterPrompt(options.path, options.name, options.options);
 });
 /**
@@ -273,7 +273,7 @@ aio
     .option('--path [path]', 'destination path location')
     .description(`${greenBright('[Usage] >>')} Processing Image Input.`)
     .action(async (options) => {
-    const { ImageConverterPrompt } = await import('./prompts/ImageProcessor/ImageConverter.prompt.js');
+    const { ImageConverterPrompt } = await import('./prompts/Image/ImageConverter.prompt.js');
     await ImageConverterPrompt(options.path, options.name);
 });
 /**
@@ -300,12 +300,12 @@ aio
  */
 aio
     .command('optimizer')
-    .aliases(['o', 'O'])
+    .aliases(['o', 'Opt'])
     .option('-p, --path [path]', 'source path location')
     .option('-n, --name [filename]', 'file name')
     .description(`${greenBright('[Usage] >>')} Optimized image files for production.`)
     .action(async (options) => {
-    const { ImageOptimizerPrompt } = await import('./prompts/ImageProcessor/ImageOptimizer.prompt.js');
+    const { ImageOptimizerPrompt } = await import('./prompts/Image/ImageOptimizer.prompt.js');
     await ImageOptimizerPrompt(options.path, options.name);
 });
 aio.parse(process.argv);

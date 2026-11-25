@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { existsSync } from "fs";
+import { existsSync, statSync } from "fs";
 import { copyFile, mkdir, readdir } from "fs/promises";
 import { join, resolve } from "path";
 
@@ -45,14 +45,22 @@ async function compileAssets(pathToCompile) {
           if (!existsSync(destDir)) {
             await mkdir(destDir, { recursive: true });
           }
-          await copyFile(srcPath, destPath);
+          // Skip identical files so heavy assets (traineddata ~31MB) are not rewritten on every build
+          const unchanged =
+            existsSync(destPath) &&
+            statSync(srcPath).size === statSync(destPath).size;
+          if (!unchanged) {
+            await copyFile(srcPath, destPath);
+          }
         }
       }
     } catch (error) {
       console.error(`Error processing directory ${currentDir}:`, error);
     }
   }
-  console.log("Assets compiled successfully!");
 }
 
-compileAssets("lib/templates");
+await compileAssets("lib/templates");
+// tessdata for OCRProcessor (runtime path: dest/lib/data)
+await compileAssets("lib/data");
+console.log("Assets compiled successfully!");

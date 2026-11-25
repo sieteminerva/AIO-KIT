@@ -19,9 +19,6 @@ export declare class AioProjectScaffolder {
      */
     DesignProject(DIR: string): void;
     /**
-     * // TODO
-     * - new vite x @aio-ui (custom build)
-     * - new vite x @aio-gas consumer
      *
      * Creates a directory structure for a web project.
      *
