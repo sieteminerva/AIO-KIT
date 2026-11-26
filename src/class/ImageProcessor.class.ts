@@ -1,5 +1,6 @@
 
 import { dirname, extname, join, resolve } from "path";
+import { existsSync } from "node:fs";
 import { AioFileOperation } from "./FileOperation.class.js";
 import sharp, {
   type FormatEnum,
@@ -61,6 +62,23 @@ export interface ImageOptions extends JpegOptions, PngOptions, WebpOptions,
   optimize?: boolean;
   density?: number;
   background?: string;
+}
+
+/**
+ * @interface StitchOptions
+ * Options for stitching multiple images into one animated GIF.
+ * Extends {@link GifOptions}, so every GIF encoder setting (`colors`, `effort`,
+ * `dither`, `delay`, `loop`, ...) produced by `SetGifOptionsPrompt` is forwarded.
+ * @property {string} [background] - Background color used to normalize frames with transparency. Defaults to `#ffffff`.
+ * @property {number} [width] - Resize every frame to this width (contain, keeps aspect ratio).
+ * @property {boolean} [watermark] - Stamp the watermark on every frame.
+ * @property {string} [watermarkPosition] - Gravity of the watermark (e.g. `center`, `southeast`).
+ */
+export interface StitchOptions extends GifOptions {
+  background?: string;
+  width?: number;
+  watermark?: boolean;
+  watermarkPosition?: string;
 }
 
 /**
@@ -356,8 +374,72 @@ export class AioImageProcessor extends AioFileOperation {
   }
 
   /**
+   * Stitches several images into one animated GIF.
+   *
+   * Frames are normalized to the size of the **first** file (`contain`, keeps aspect
+   * ratio, transparency flattened onto `background`) because every GIF frame must
+   * share identical dimensions.
+   *
+   * @param {string[]} files - Source images, in playback order.
+   * @param {string} outputPath - Destination `.gif` path.
+   * @param {StitchOptions} [options] - Delay / loop / background / width.
+   * @returns {Promise<string>} The written output path.
+   * @throws {Error} When no files are provided.
+   *
+   * @example
+   * ```typescript
+   *
+   *    await imageProcessor.gif(['01.png', '02.png'], './out.gif', { delay: 500, loop: 0 });
+   *
+   * ```
+   */
+  async gif(files: string[], outputPath: string, options: StitchOptions = {}): Promise<string> {
+    if (!files || files.length === 0) {
+      throw new Error('No frames provided for the animated GIF.');
+    }
+
+    const { delay = 200, loop = 0, background = '#ffffff', width, watermark, watermarkPosition, ...gifOptions } = options;
+
+    const base = await this._Sharp(files[0]).metadata();
+    if (!base.width || !base.height) {
+      throw new Error(`Cannot read the size of the first frame: ${files[0]}`);
+    }
+
+    // every frame must share the same canvas, otherwise frames get misaligned
+    const canvas = {
+      width: width ?? base.width,
+      height: width
+        ? Math.round((base.height / base.width) * width)
+        : base.height,
+    };
+
+    const frames = await Promise.all(
+      files.map(async (file) => {
+        let frame = this._Sharp(file)
+          .resize({ ...canvas, fit: 'contain', background })
+          .flatten({ background });
+
+        if (watermark) {
+          frame = await this._watermark(frame, watermarkPosition);
+        }
+
+        return frame.toBuffer();
+      })
+    );
+
+    // a single number only reaches frame #1, so broadcast it to every frame
+    const frameDelay = Array.isArray(delay) ? delay : Array(frames.length).fill(delay);
+
+    await this._Sharp(frames as any, { join: { animated: true } })
+      .gif({ effort: 7, ...gifOptions, delay: frameDelay, loop })
+      .toFile(outputPath);
+
+    return outputPath;
+  }
+
+  /**
    * @public
-   * 
+   *
    * Converts the image to the specified format and applies various options.
    * @param {string | undefined} pathOrFormat - The output path or the desired format (e.g., 'jpg', 'png'). If only format is provided, the output will be in the same directory as the source.
    * @param {ImageOptions} options - Options for image processing, including format-specific options, resizing, watermark, etc.
@@ -472,8 +554,7 @@ export class AioImageProcessor extends AioFileOperation {
 
     // Add Watermark
     if (options.watermark) {
-      this.watermark.position = options.watermarkPosition ? options.watermarkPosition : 'center';
-      await this._setMetadata(converter);
+      converter = await this._watermark(converter, options.watermarkPosition ?? this.settings.watermark.position);
     }
 
     // output path should be final path the result with the desired extension
@@ -600,36 +681,51 @@ export class AioImageProcessor extends AioFileOperation {
   }
 
   /**
-   * Sets the watermark on the image.
-   * @param {sharp.Sharp} converter - The sharp instance for the image.
-   * @returns {Promise<void>} - A promise that resolves when the watermark is applied.
-   * @example 
+   * Stamps the configured watermark onto a sharp pipeline.
+   *
+   * Returns the **new** pipeline: sharp chaining is immutable, so reassigning the
+   * local argument (the previous behaviour) dropped the composite entirely.
+   *
+   * @param {Sharp} converter - The sharp instance of the image (or of one animation frame).
+   * @param {string} [position] - Gravity of the watermark; defaults to the configured settings.
+   * @returns {Promise<Sharp>} - The pipeline with the watermark appended.
+   * @example
    * ```typescript
-   * 
-   *    await this._setMetadata(converter);
-   * 
+   *
+   *    converter = await this._watermark(converter, 'southeast');
+   *
    * ```
    */
-  private async _setMetadata(converter: Sharp) {
+  private async _watermark(converter: Sharp, position?: string): Promise<Sharp> {
     const watermarkSettings = {
       path: this.settings.watermark.path,
       opacity: this.settings.watermark.opacity, // Default opacity
       position: this.settings.watermark.position,
       margin: this.settings.watermark.margin,
       ...this.settings.watermark, // Override with provided settings
+      ...(position ? { position } : {}),
     };
+
+    if (!watermarkSettings.path || !existsSync(watermarkSettings.path)) {
+      console.warn(`Watermark skipped: file not found at ${watermarkSettings.path}`);
+      return converter;
+    }
+
     const watermark = this._Sharp(watermarkSettings.path);
     const watermarkMeta = await watermark.metadata();
 
-    // console.log("watermarkMeta :", watermarkMeta);
+    // resize dimensions must be integers
+    const width = Math.max(1, Math.round((watermarkMeta.width as number) / 5));
+    const height = Math.max(1, Math.round((watermarkMeta.height as number) / 5));
 
     const watermarkImg = await watermark
-      .resize((watermarkMeta.width as number) / 5, (watermarkMeta.height as number) / 5) // resizing the watermark image
+      .resize(width, height) // resizing the watermark image
       .ensureAlpha(watermarkSettings.opacity)
       .toBuffer();
 
-    const compositeOptions = [{ input: watermarkImg, blend: 'over', gravity: watermarkSettings.position }] as any;
-    converter = converter.composite(compositeOptions as OverlayOptions[]);
+    return converter.composite([
+      { input: watermarkImg, blend: 'over', gravity: watermarkSettings.position },
+    ] as OverlayOptions[]);
   }
 
 }

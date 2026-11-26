@@ -105,11 +105,23 @@ export async function SetGifOptionsPrompt(): Promise<ImageOptions> {
         break;
       /**
        * Option to set the delay between animation frames.
-       * The user can input multiple delays separated by commas.
+       * Accepts a single value (`200`) or one delay per frame (`100,200,300`).
+       * Left empty → the caller's default is used.
        */
-      case 'delay':
-        options.delay = await input({ message: 'Delay(s) between animation frames (in milliseconds, comma-separated):', default: '' }).then(input => input.split(',').map(Number));
+      case 'delay': {
+        const raw = await input({
+          message: 'Delay between animation frames in ms (single value or comma-separated):',
+          default: '200',
+        });
+        const values = raw
+          .split(',')
+          .map((value) => Number(value.trim()))
+          .filter((value) => Number.isFinite(value) && value > 0);
+        options.delay = values.length === 0
+          ? undefined
+          : values.length === 1 ? values[0] : values;
         break;
+      }
       /**
        * Option to skip adding more options.
        * This will exit the loop and return the current options.

@@ -44,6 +44,22 @@ export interface ImageOptions extends JpegOptions, PngOptions, WebpOptions, Tiff
     background?: string;
 }
 /**
+ * @interface StitchOptions
+ * Options for stitching multiple images into one animated GIF.
+ * Extends {@link GifOptions}, so every GIF encoder setting (`colors`, `effort`,
+ * `dither`, `delay`, `loop`, ...) produced by `SetGifOptionsPrompt` is forwarded.
+ * @property {string} [background] - Background color used to normalize frames with transparency. Defaults to `#ffffff`.
+ * @property {number} [width] - Resize every frame to this width (contain, keeps aspect ratio).
+ * @property {boolean} [watermark] - Stamp the watermark on every frame.
+ * @property {string} [watermarkPosition] - Gravity of the watermark (e.g. `center`, `southeast`).
+ */
+export interface StitchOptions extends GifOptions {
+    background?: string;
+    width?: number;
+    watermark?: boolean;
+    watermarkPosition?: string;
+}
+/**
  * @type ImageFormat
  * Represents the supported image formats.
  * @property {'jpg' | 'jpeg' | 'png' | 'webp' | 'tiff' | 'gif'}
@@ -252,6 +268,27 @@ export declare class AioImageProcessor extends AioFileOperation {
      */
     img(filepath: string): this;
     /**
+     * Stitches several images into one animated GIF.
+     *
+     * Frames are normalized to the size of the **first** file (`contain`, keeps aspect
+     * ratio, transparency flattened onto `background`) because every GIF frame must
+     * share identical dimensions.
+     *
+     * @param {string[]} files - Source images, in playback order.
+     * @param {string} outputPath - Destination `.gif` path.
+     * @param {StitchOptions} [options] - Delay / loop / background / width.
+     * @returns {Promise<string>} The written output path.
+     * @throws {Error} When no files are provided.
+     *
+     * @example
+     * ```typescript
+     *
+     *    await imageProcessor.gif(['01.png', '02.png'], './out.gif', { delay: 500, loop: 0 });
+     *
+     * ```
+     */
+    gif(files: string[], outputPath: string, options?: StitchOptions): Promise<string>;
+    /**
      * @public
      *
      * Converts the image to the specified format and applies various options.
@@ -328,15 +365,20 @@ export declare class AioImageProcessor extends AioFileOperation {
      */
     private _setExifMetadata;
     /**
-     * Sets the watermark on the image.
-     * @param {sharp.Sharp} converter - The sharp instance for the image.
-     * @returns {Promise<void>} - A promise that resolves when the watermark is applied.
+     * Stamps the configured watermark onto a sharp pipeline.
+     *
+     * Returns the **new** pipeline: sharp chaining is immutable, so reassigning the
+     * local argument (the previous behaviour) dropped the composite entirely.
+     *
+     * @param {Sharp} converter - The sharp instance of the image (or of one animation frame).
+     * @param {string} [position] - Gravity of the watermark; defaults to the configured settings.
+     * @returns {Promise<Sharp>} - The pipeline with the watermark appended.
      * @example
      * ```typescript
      *
-     *    await this._setMetadata(converter);
+     *    converter = await this._watermark(converter, 'southeast');
      *
      * ```
      */
-    private _setMetadata;
+    private _watermark;
 }

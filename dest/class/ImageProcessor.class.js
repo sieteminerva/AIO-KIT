@@ -1,4 +1,5 @@
 import { dirname, extname, join, resolve } from "path";
+import { existsSync } from "node:fs";
 import { AioFileOperation } from "./FileOperation.class.js";
 import sharp from "sharp";
 import { fileURLToPath } from "url";
@@ -267,6 +268,58 @@ export class AioImageProcessor extends AioFileOperation {
         return this;
     }
     /**
+     * Stitches several images into one animated GIF.
+     *
+     * Frames are normalized to the size of the **first** file (`contain`, keeps aspect
+     * ratio, transparency flattened onto `background`) because every GIF frame must
+     * share identical dimensions.
+     *
+     * @param {string[]} files - Source images, in playback order.
+     * @param {string} outputPath - Destination `.gif` path.
+     * @param {StitchOptions} [options] - Delay / loop / background / width.
+     * @returns {Promise<string>} The written output path.
+     * @throws {Error} When no files are provided.
+     *
+     * @example
+     * ```typescript
+     *
+     *    await imageProcessor.gif(['01.png', '02.png'], './out.gif', { delay: 500, loop: 0 });
+     *
+     * ```
+     */
+    async gif(files, outputPath, options = {}) {
+        if (!files || files.length === 0) {
+            throw new Error('No frames provided for the animated GIF.');
+        }
+        const { delay = 200, loop = 0, background = '#ffffff', width, watermark, watermarkPosition, ...gifOptions } = options;
+        const base = await this._Sharp(files[0]).metadata();
+        if (!base.width || !base.height) {
+            throw new Error(`Cannot read the size of the first frame: ${files[0]}`);
+        }
+        // every frame must share the same canvas, otherwise frames get misaligned
+        const canvas = {
+            width: width ?? base.width,
+            height: width
+                ? Math.round((base.height / base.width) * width)
+                : base.height,
+        };
+        const frames = await Promise.all(files.map(async (file) => {
+            let frame = this._Sharp(file)
+                .resize({ ...canvas, fit: 'contain', background })
+                .flatten({ background });
+            if (watermark) {
+                frame = await this._watermark(frame, watermarkPosition);
+            }
+            return frame.toBuffer();
+        }));
+        // a single number only reaches frame #1, so broadcast it to every frame
+        const frameDelay = Array.isArray(delay) ? delay : Array(frames.length).fill(delay);
+        await this._Sharp(frames, { join: { animated: true } })
+            .gif({ effort: 7, ...gifOptions, delay: frameDelay, loop })
+            .toFile(outputPath);
+        return outputPath;
+    }
+    /**
      * @public
      *
      * Converts the image to the specified format and applies various options.
@@ -371,8 +424,7 @@ export class AioImageProcessor extends AioFileOperation {
         }
         // Add Watermark
         if (options.watermark) {
-            this.watermark.position = options.watermarkPosition ? options.watermarkPosition : 'center';
-            await this._setMetadata(converter);
+            converter = await this._watermark(converter, options.watermarkPosition ?? this.settings.watermark.position);
         }
         // output path should be final path the result with the desired extension
         const result = await converter.toFile(this.outputPath);
@@ -487,32 +539,45 @@ export class AioImageProcessor extends AioFileOperation {
         return exifData;
     }
     /**
-     * Sets the watermark on the image.
-     * @param {sharp.Sharp} converter - The sharp instance for the image.
-     * @returns {Promise<void>} - A promise that resolves when the watermark is applied.
+     * Stamps the configured watermark onto a sharp pipeline.
+     *
+     * Returns the **new** pipeline: sharp chaining is immutable, so reassigning the
+     * local argument (the previous behaviour) dropped the composite entirely.
+     *
+     * @param {Sharp} converter - The sharp instance of the image (or of one animation frame).
+     * @param {string} [position] - Gravity of the watermark; defaults to the configured settings.
+     * @returns {Promise<Sharp>} - The pipeline with the watermark appended.
      * @example
      * ```typescript
      *
-     *    await this._setMetadata(converter);
+     *    converter = await this._watermark(converter, 'southeast');
      *
      * ```
      */
-    async _setMetadata(converter) {
+    async _watermark(converter, position) {
         const watermarkSettings = {
             path: this.settings.watermark.path,
             opacity: this.settings.watermark.opacity, // Default opacity
             position: this.settings.watermark.position,
             margin: this.settings.watermark.margin,
             ...this.settings.watermark, // Override with provided settings
+            ...(position ? { position } : {}),
         };
+        if (!watermarkSettings.path || !existsSync(watermarkSettings.path)) {
+            console.warn(`Watermark skipped: file not found at ${watermarkSettings.path}`);
+            return converter;
+        }
         const watermark = this._Sharp(watermarkSettings.path);
         const watermarkMeta = await watermark.metadata();
-        // console.log("watermarkMeta :", watermarkMeta);
+        // resize dimensions must be integers
+        const width = Math.max(1, Math.round(watermarkMeta.width / 5));
+        const height = Math.max(1, Math.round(watermarkMeta.height / 5));
         const watermarkImg = await watermark
-            .resize(watermarkMeta.width / 5, watermarkMeta.height / 5) // resizing the watermark image
+            .resize(width, height) // resizing the watermark image
             .ensureAlpha(watermarkSettings.opacity)
             .toBuffer();
-        const compositeOptions = [{ input: watermarkImg, blend: 'over', gravity: watermarkSettings.position }];
-        converter = converter.composite(compositeOptions);
+        return converter.composite([
+            { input: watermarkImg, blend: 'over', gravity: watermarkSettings.position },
+        ]);
     }
 }
